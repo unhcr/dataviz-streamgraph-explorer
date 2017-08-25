@@ -1,7 +1,7 @@
 {
   "name": "streamgraph-explorer",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Interactive visualization using StreamGraphs",
   "main": "webpack.config.js",
   "dependencies": {
   },
@@ -17,8 +17,8 @@
     "url": "git+https://github.com/unhcr/streamgraph-explorer.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "UNHCR",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/unhcr/streamgraph-explorer/issues"
   },
