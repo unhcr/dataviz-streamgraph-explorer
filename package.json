@@ -1,0 +1,26 @@
+{
+  "name": "streamgraph-explorer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "webpack": "^3.5.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unhcr/streamgraph-explorer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unhcr/streamgraph-explorer/issues"
+  },
+  "homepage": "https://github.com/unhcr/streamgraph-explorer#readme"
+}
