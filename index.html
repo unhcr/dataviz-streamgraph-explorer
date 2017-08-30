@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width">
     <title>StreamGraph Explorer</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
-    <script src="dist/bundle.js"></script>
   </head>
   <body>
     <div class="ui stackable two column grid">
@@ -60,6 +59,7 @@
           <h1>Destinations</h1>
           <p>Click on a country or year to select</p>
         </div>
+        <svg id="focus"></svg>
       </div>
       <div class="four wide column">
         <div class="ui statistic">
@@ -76,7 +76,9 @@
             1,230,123
           </div>
         </div>
+        <svg id="details"></svg>
       </div>
     </div>
+    <script src="dist/bundle.js"></script>
   </body>
 </html>
