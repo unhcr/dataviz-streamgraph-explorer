@@ -1,4 +1,5 @@
 import { select } from 'd3-selection';
+import { json } from 'd3-request';
 import resize from './resize';
 
 // Set up the behavior that resizes the SVG elements
@@ -9,3 +10,7 @@ resize();
 select('#focus svg').style('background-color', 'pink');
 select('#details svg').style('background-color', 'pink');
 
+// Load and unpack the data.
+json('data/data.json', packedData => {
+  console.log(packedData);
+});
