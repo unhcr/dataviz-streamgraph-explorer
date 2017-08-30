@@ -1,9 +1,7 @@
-function detectMobile() {
-   if(window.innerWidth <= 800 && window.innerHeight <= 600) {
-     return true;
-   } else {
-     return false;
-   }
-}
+// This is the width at which the Semantic UI Grid
+// stacks the divs, changes to mobile layout.
+const semanticUIBreakpoint = 768;
 
-export default detectMobile;
+export default function detectMobile() {
+  return window.innerWidth < semanticUIBreakpoint;
+}

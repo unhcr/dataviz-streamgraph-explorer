@@ -1,9 +1,10 @@
 import { select } from 'd3-selection';
 import detectMobile from './detectMobile';
-const device = detectMobile() ? 'mobile' : 'desktop';
-console.log('We are on a ' + device);
 
 function resize() {
+
+  const device = detectMobile() ? 'mobile' : 'desktop';
+  console.log('We are on a ' + device);
 
   const focus = select('#focus').node().getBoundingClientRect();
   select('#focus svg')
