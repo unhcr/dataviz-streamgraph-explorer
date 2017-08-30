@@ -13,30 +13,21 @@ select('#details svg').style('background-color', 'pink');
 function resize() {
 
   // Detect if we're on desktop or mobile.
-  const device = detectMobile() ? 'mobile' : 'desktop';
+  const mobile = detectMobile();
 
   // Get the CSS-computed bounding boxes of the DIVs containing the SVGs.
   const focus = select('#focus').node().getBoundingClientRect();
   const details = select('#details').node().getBoundingClientRect();
 
-  const focusSVG = select('#focus svg');
-  const detailsSVG = select('#details svg');
-
   // Set the width to fill the DIV, on both mobile and desktop.
-  focusSVG.attr('width', focus.width);
-  detailsSVG.attr('width', details.width);
-
   // For desktop, set the heights to fill in all the available space.
-  if (device === 'desktop') {
-    focusSVG.attr('height', window.innerHeight - focus.top);
-    detailsSVG.attr('height', window.innerHeight - details.top);
-  }
-  
   // For mobile, use fixed heights.
-  if (device === 'mobile') {
-    focusSVG.attr('height', focusMobileHeight);
-    detailsSVG.attr('height', detailsMobileHeight);
-  }
+  select('#focus svg')
+    .attr('width', focus.width)
+    .attr('height', mobile ? focusMobileHeight : window.innerHeight - focus.top);
+  select('#details svg')
+    .attr('width', details.width)
+    .attr('height', mobile ? detailsMobileHeight : window.innerHeight - details.top);
 }
 
 
