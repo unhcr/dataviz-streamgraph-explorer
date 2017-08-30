@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width">
     <title>StreamGraph Explorer</title>
     <link rel="stylesheet" href="https://unpkg.com/dataviz-styleguide/semantic/dist/semantic.min.css">
-    <script src="dist/bundle.js"></script>
   </head>
   <body>
     <div class="ui stackable two column grid">
@@ -60,6 +59,9 @@
           <h1>Destinations</h1>
           <p>Click on a country or year to select</p>
         </div>
+        <div id="focus">
+          <svg></svg>
+        </div>
       </div>
       <div class="four wide column">
         <div class="ui statistic">
@@ -76,7 +78,11 @@
             1,230,123
           </div>
         </div>
+        <div id="details">
+          <svg></svg>
+        </div>
       </div>
     </div>
+    <script src="dist/bundle.js"></script>
   </body>
 </html>
