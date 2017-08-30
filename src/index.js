@@ -5,18 +5,16 @@ console.log('We are on a ' + device);
 
 function resize() {
 
-  // Extract the width and height that was computed by CSS.
   const focus = select('#focus').node().getBoundingClientRect();
   select('#focus svg')
       .attr('width', focus.width)
       .attr('height', window.innerHeight - focus.top)
       .style('background-color', 'pink');
 
-
-  const detailsDiv = select('#details').node();
+  const details = select('#details').node().getBoundingClientRect();
   select('#details svg')
-      .attr('width', detailsDiv.clientWidth)
-      .attr('height', detailsDiv.clientHeight)
+      .attr('width', details.width)
+      .attr('height', window.innerHeight - details.top)
       .style('background-color', 'pink');
 }
 
