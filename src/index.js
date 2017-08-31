@@ -2,6 +2,7 @@ import ReactiveModel from 'reactive-model';
 import { select } from 'd3-selection';
 import { json } from 'd3-request';
 import resize from './resize';
+import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import unpackData from './unpackData';
 
@@ -28,27 +29,7 @@ dataFlow('mobile', detectMobile, 'windowBox');
 
 // Compute the layout object, which contains the computed dimensions
 // for the focus and details views, as 'focusBox' and 'detailsBox'.
-dataFlow('layout', (mobile, windowBox) => {
-
-  // These values determine the height of each SVG on mobile devices.
-  const focusMobileHeight = 500;
-  const detailsMobileHeight = 500;
-
-  // Get the CSS-computed bounding boxes of the DIVs containing the SVGs.
-  const focus = select('#focus').node().getBoundingClientRect();
-  const details = select('#details').node().getBoundingClientRect();
-
-  return {
-    focusBox: {
-      width: focus.width,
-      height: mobile ? focusMobileHeight : windowBox.height - focus.top
-    },
-    detailsBox: {
-      width: details.width,
-      height: mobile ? detailsMobileHeight : windowBox.height - details.top
-    }
-  };
-}, 'mobile, windowBox');
+dataFlow('layout', computeLayout, 'mobile, windowBox');
 
 // Unpack the layout object into the data flow graph.
 dataFlow('focusBox', layout => layout.focusBox, 'layout');
