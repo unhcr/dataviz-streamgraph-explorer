@@ -1,10 +1,8 @@
 import ReactiveModel from 'reactive-model';
 import { select } from 'd3-selection';
-import { json } from 'd3-request';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
-import unpackData from './unpackData';
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -52,7 +50,11 @@ dataFlow('detailsSVGSize', detailsBox => {
 select('#focus svg').style('background-color', 'pink');
 select('#details svg').style('background-color', 'pink');
 
-// Load and unpack the data.
-json('data/data.json', packedData => {
-  console.log(unpackData(packedData));
-});
+// Start the Web Worker that simulates the API.
+const apiSimulationWorker = new Worker('dist/apiSimulationWorker.js');
+
+apiSimulationWorker.postMessage(['test']);
+
+apiSimulationWorker.onmessage = e => {
+  console.log(e.data);
+}
