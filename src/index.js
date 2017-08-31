@@ -11,6 +11,17 @@ const dataFlow = ReactiveModel();
 // representing the dimensions of the browser window.
 dataFlow('windowBox');
 
+// The query object that gets passed into the API (or API simulation)
+// that fetches the filtered and aggregated data for source and destination streams.
+// TODO derive this from the URL via data flow graph.
+dataFlow('apiQuery', { src: null, dest: null, types: null });
+
+// The response that comes back from the API,
+// an object containing properties 'srcData' and 'destData'.
+dataFlow('apiResponse');
+
+
+
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
 // and put the browser window box into the data flow graph.
@@ -53,8 +64,26 @@ select('#details svg').style('background-color', 'pink');
 // Start the Web Worker that simulates the API.
 const apiSimulationWorker = new Worker('dist/apiSimulationWorker.js');
 
-apiSimulationWorker.postMessage(['test']);
+// Post a message to the worker containing the API query
+// whenever the API query changes.
+dataFlow('apiRequest', apiQuery => {
+  apiSimulationWorker.postMessage(apiQuery);
+}, 'apiQuery');
 
+// Receive the asynchronous response from the API simulation
+// and pass it into the data flow graph.
 apiSimulationWorker.onmessage = e => {
-  console.log(e.data);
+  dataFlow.apiResponse(e.data);
 }
+
+// Unpack the API response into the data flow graph.
+dataFlow('srcData', d => d.srcData, 'apiResponse');
+dataFlow('destData', d => d.destData, 'apiResponse');
+
+// Test that everything worked (temporary).
+dataFlow('testing', (srcData, destData) => {
+  console.log("Data aggregated by source");
+  console.log(srcData);
+  console.log("Data aggregated by destination");
+  console.log(destData);
+}, 'srcData, destData');
