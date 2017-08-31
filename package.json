@@ -4,6 +4,7 @@
   "description": "Interactive visualization using StreamGraphs",
   "main": "webpack.config.js",
   "dependencies": {
+    "d3-request": "^1.0.5",
     "d3-selection": "^1.1.0"
   },
   "devDependencies": {
