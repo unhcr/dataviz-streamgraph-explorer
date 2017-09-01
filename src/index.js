@@ -3,6 +3,7 @@ import { select } from 'd3-selection';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
+import apiSimulation from './apiSimulation';
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -61,20 +62,16 @@ dataFlow('detailsSVGSize', detailsBox => {
 select('#focus svg').style('background-color', 'pink');
 select('#details svg').style('background-color', 'pink');
 
-// Start the Web Worker that simulates the API.
-const apiSimulationWorker = new Worker('dist/apiSimulationWorker.js');
+//TODO change this one line to use the real API when it's ready.
+const api = apiSimulation;
 
 // Post a message to the worker containing the API query
 // whenever the API query changes.
-dataFlow('apiRequest', apiQuery => {
-  apiSimulationWorker.postMessage(apiQuery);
-}, 'apiQuery');
+dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 
 // Receive the asynchronous response from the API simulation
 // and pass it into the data flow graph.
-apiSimulationWorker.onmessage = e => {
-  dataFlow.apiResponse(e.data);
-}
+api.onResponse(dataFlow.apiResponse);
 
 // Unpack the API response into the data flow graph.
 dataFlow('srcData', d => d.srcData, 'apiResponse');
