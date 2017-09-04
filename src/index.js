@@ -4,6 +4,7 @@ import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
+import typeSelector from './typeSelector';
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -84,3 +85,6 @@ dataFlow('testing', (srcData, destData) => {
   console.log("Data aggregated by destination");
   console.log(destData);
 }, 'srcData, destData');
+
+// Render the type selector buttons.
+typeSelector(select('#typeSelector'));
