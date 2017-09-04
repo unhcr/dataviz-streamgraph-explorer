@@ -87,4 +87,6 @@ dataFlow('testing', (srcData, destData) => {
 }, 'srcData, destData');
 
 // Render the type selector buttons.
-typeSelector(select('#typeSelector'));
+const availableTypes = ['Refugees', 'Asylum-seekers'];
+select('#typeSelector')
+    .call(typeSelector, { availableTypes })
