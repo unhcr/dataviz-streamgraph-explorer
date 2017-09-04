@@ -2,6 +2,6 @@
 // stacks the divs, changes to mobile layout.
 const semanticUIBreakpoint = 768;
 
-export default function detectMobile() {
-  return window.innerWidth < semanticUIBreakpoint;
+export default function detectMobile(windowBox) {
+  return windowBox.width < semanticUIBreakpoint;
 }
