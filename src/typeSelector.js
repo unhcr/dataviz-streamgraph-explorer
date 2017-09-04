@@ -18,7 +18,6 @@ const radioButtonLabel = component('label')
 // The component for radio button containers.
 const radioButton = component('div', 'ui radio checkbox')
   .render((selection, d) => {
-    console.log(d);
     selection
       .call(radioButtonInput, d)
       .call(radioButtonLabel, d.type);
@@ -28,13 +27,21 @@ const radioButton = component('div', 'ui radio checkbox')
 const field = component('div', 'field')
   .render(radioButton);
 
+// The reset button components.
+const resetButton= component('button', 'ui primary button')
+  .render(selection => selection.text('Reset selection'));
+const resetButtonField = component('div', 'field')
+  .render(resetButton);
+
 // The element containing inline form fields.
 const fields = component('div', 'inline fields')
   .render((selection, d) => {
-    selection.call(field, d.availableTypes.map(type => ({
-      type,
-      checked: d.selectedTypes.indexOf(type) !== -1
-    })));
+    selection
+      .call(field, d.availableTypes.map(type => ({
+        type,
+        checked: d.selectedTypes.indexOf(type) !== -1
+      })))
+      .call(resetButton);
   });
 
 // The top-level form element containing all buttons.
@@ -42,9 +49,3 @@ const typeSelector = component('div', 'ui form')
   .render(fields);
 
 export default typeSelector;
-
-//        <div class="field">
-//          <button class="ui primary button">
-//            Reset selection
-//          </button>
-//        </div>
