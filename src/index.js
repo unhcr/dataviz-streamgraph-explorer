@@ -1,10 +1,9 @@
 import ReactiveModel from 'reactive-model';
 import { select } from 'd3-selection';
-import { json } from 'd3-request';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
-import unpackData from './unpackData';
+import apiSimulation from './apiSimulation';
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -12,6 +11,17 @@ const dataFlow = ReactiveModel();
 // An object with 'width' and 'height' properties
 // representing the dimensions of the browser window.
 dataFlow('windowBox');
+
+// The query object that gets passed into the API (or API simulation)
+// that fetches the filtered and aggregated data for source and destination streams.
+// TODO derive this from the URL via data flow graph.
+dataFlow('apiQuery', { src: null, dest: null, types: null });
+
+// The response that comes back from the API,
+// an object containing properties 'srcData' and 'destData'.
+dataFlow('apiResponse');
+
+
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
@@ -52,7 +62,25 @@ dataFlow('detailsSVGSize', detailsBox => {
 select('#focus svg').style('background-color', 'pink');
 select('#details svg').style('background-color', 'pink');
 
-// Load and unpack the data.
-json('data/data.json', packedData => {
-  console.log(unpackData(packedData));
-});
+//TODO change this one line to use the real API when it's ready.
+const api = apiSimulation;
+
+// Post a message to the worker containing the API query
+// whenever the API query changes.
+dataFlow('apiRequest', api.sendRequest, 'apiQuery');
+
+// Receive the asynchronous response from the API simulation
+// and pass it into the data flow graph.
+api.onResponse(dataFlow.apiResponse);
+
+// Unpack the API response into the data flow graph.
+dataFlow('srcData', d => d.srcData, 'apiResponse');
+dataFlow('destData', d => d.destData, 'apiResponse');
+
+// Test that everything worked (temporary).
+dataFlow('testing', (srcData, destData) => {
+  console.log("Data aggregated by source");
+  console.log(srcData);
+  console.log("Data aggregated by destination");
+  console.log(destData);
+}, 'srcData, destData');
