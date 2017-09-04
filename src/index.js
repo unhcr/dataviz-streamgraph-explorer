@@ -87,22 +87,22 @@ dataFlow('testing', (srcData, destData) => {
 }, 'srcData, destData');
 
 // Render the type selector buttons.
-const availableTypes = [
-  'Refugees',
-  'Asylum-seekers',
-  'IDPs',
-  'Returnees',
-  'Stateless persons',
-  'Other persons of concern'
-];
-const selectedTypes = [
-  'Refugees',
-  'Stateless persons',
-  'IDPs'
-];
 select('#typeSelector').call(typeSelector, {
-  availableTypes,
-  selectedTypes,
+  // TODO derive this from the data.
+  availableTypes: [
+    'Refugees',
+    'Asylum-seekers',
+    'IDPs',
+    'Returnees',
+    'Stateless persons',
+    'Other persons of concern'
+  ],
+  // TODO derive selected types from the dataflow graph.
+  selectedTypes: [
+    'Refugees',
+    'Stateless persons',
+    'IDPs'
+  ],
   onReset: () => {
     // TODO propagate this change into the data flow graph.
     console.log('Reset selection');

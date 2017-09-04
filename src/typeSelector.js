@@ -42,18 +42,35 @@ const resetButtonField = component('div', 'field')
 // The element containing inline form fields.
 const fields = component('div', 'inline fields')
   .render((selection, d) => {
+
+    // Create a Set of the selected types.
     const selectedTypesSet = set(d.selectedTypes);
+
+    // Render a field component for each available type.
     selection
       .call(field, d.availableTypes.map(type => ({
+
+        // Pass in the type name for labeling.
         type,
+
+        // Make it checked if it's a selected type.
         checked: selectedTypesSet.has(type),
+
+        // When a checkbox is clicked...
         onClick: clicked => {
+
+          // Invert its checked property.
           clicked.checked = !clicked.checked;
+
+          // Add or remove it from the set of selected types.
           if (clicked.checked) {
             selectedTypesSet.add(clicked.type);
           } else {
             selectedTypesSet.remove(clicked.type);
           }
+
+          // Pass the array of selected types
+          // to the listener passed in from outside.
           d.onChange(selectedTypesSet.values());
         }
       })))
