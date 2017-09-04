@@ -100,5 +100,11 @@ const selectedTypes = [
   'Stateless persons',
   'IDPs'
 ];
-select('#typeSelector')
-    .call(typeSelector, { availableTypes, selectedTypes })
+select('#typeSelector').call(typeSelector, {
+  availableTypes,
+  selectedTypes,
+  onReset: () => {
+    // TODO propagate this change into the data flow graph.
+    console.log('Reset selection');
+  }
+});

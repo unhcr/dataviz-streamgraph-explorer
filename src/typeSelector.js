@@ -29,7 +29,11 @@ const field = component('div', 'field')
 
 // The reset button components.
 const resetButton= component('button', 'ui primary button')
-  .render(selection => selection.text('Reset selection'));
+  .render((selection, onReset) => {
+    selection
+      .text('Reset selection')
+      .on('click', onReset);
+  });
 const resetButtonField = component('div', 'field')
   .render(resetButton);
 
@@ -41,7 +45,7 @@ const fields = component('div', 'inline fields')
         type,
         checked: d.selectedTypes.indexOf(type) !== -1
       })))
-      .call(resetButton);
+      .call(resetButton, d.onReset);
   });
 
 // The top-level form element containing all buttons.
