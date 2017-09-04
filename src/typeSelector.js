@@ -1,4 +1,5 @@
 import { component } from 'd3-component';
+import { set } from 'd3-collection';
 
 // The component for radio button input fields.
 const radioButtonInput = component('input')
@@ -6,7 +7,8 @@ const radioButtonInput = component('input')
     selection
         .attr('type', 'radio')
         .attr('name', d.type)
-        .property('checked', d.checked);
+        .property('checked', d.checked)
+        .on('click', d.onClick);
   });
 
 // The component for radio button label fields.
@@ -40,10 +42,20 @@ const resetButtonField = component('div', 'field')
 // The element containing inline form fields.
 const fields = component('div', 'inline fields')
   .render((selection, d) => {
+    const selectedTypesSet = set(d.selectedTypes);
     selection
       .call(field, d.availableTypes.map(type => ({
         type,
-        checked: d.selectedTypes.indexOf(type) !== -1
+        checked: selectedTypesSet.has(type),
+        onClick: clicked => {
+          clicked.checked = !clicked.checked;
+          if (clicked.checked) {
+            selectedTypesSet.add(clicked.type);
+          } else {
+            selectedTypesSet.remove(clicked.type);
+          }
+          d.onChange(selectedTypesSet.values());
+        }
       })))
       .call(resetButton, d.onReset);
   });

@@ -106,5 +106,9 @@ select('#typeSelector').call(typeSelector, {
   onReset: () => {
     // TODO propagate this change into the data flow graph.
     console.log('Reset selection');
+  },
+  onChange: selectedTypes => {
+    // TODO propagate this change into the data flow graph.
+    console.log('Selection changed to ' + selectedTypes);
   }
 });
