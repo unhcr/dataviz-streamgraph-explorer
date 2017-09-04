@@ -1,15 +1,37 @@
 import { component } from 'd3-component';
 
-// The component for individual fields (radio buttons).
-const field = component('div', 'field')
+// The component for radio button input fields.
+const radioButtonInput = component('input')
+  .render((selection, fieldName) => {
+    selection
+        .attr('type', 'radio')
+        .attr('name', 'frequency')
+        .attr('checked', 'checked');
+  });
+
+// The component for radio button label fields.
+const radioButtonLabel = component('label')
   .render((selection, fieldName) => {
     selection.text(fieldName);
+  });
+
+// The component for radio button containers.
+const radioButton = component('div', 'ui radio checkbox')
+  .render((selection, fieldName) => {
+    selection
+      .call(radioButtonInput, fieldName)
+      .call(radioButtonLabel, fieldName);
+  });
+
+// The component for individual fields.
+const field = component('div', 'field')
+  .render((selection, fieldName) => {
+    selection.call(radioButton, fieldName);
   });
 
 // The element containing inline form fields.
 const fields = component('div', 'inline fields')
   .render((selection, d) => {
-    console.log(d);
     selection.call(field, d.availableTypes);
   });
 
