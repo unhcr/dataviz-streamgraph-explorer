@@ -12,6 +12,7 @@ import {
   scaleOrdinal,
   schemeCategory10,
 } from 'd3-scale';
+import { set } from 'd3-collection';
 
 const xValue = d => d.date;
 
@@ -29,9 +30,23 @@ const streamStack = stack()
   .offset(stackOffsetWiggle)
   .order(stackOrderInsideOut);
 
+const computeKeys = data => {
+  const keysSet = set();
+  Object.keys(data).forEach(year => {
+    Object.keys(data[year]).forEach(key => {
+      keysSet.add(key);
+    });
+  });
+  return keysSet.values();
+};
+
 const StreamGraph = component()
   .render((selection, props) => {
-    console.log(props);
+    const data = props.data;
+    const box = props.data;
+    const keys = computeKeys(data);
+
+    console.log(keys);
   });
 
 export default StreamGraph;
