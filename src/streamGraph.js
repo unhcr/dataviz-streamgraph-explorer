@@ -45,8 +45,15 @@ const StreamGraph = component()
     const data = props.data;
     const box = props.data;
     const keys = computeKeys(data);
+    const dataForStacking = Object.keys(data)
+      .map(year => {
+        const d = data[year];
+        d.date = d.date || new Date(year);
+        return d;
+      });
+    const stacked = streamStack.keys(keys)(dataForStacking);
 
-    console.log(keys);
+    console.log(stacked);
   });
 
 export default StreamGraph;
