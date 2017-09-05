@@ -4,20 +4,25 @@ import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scal
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
 
+// The accessor function for the X value, returns the date.
 const xValue = d => d.date;
 
+// Create the x, y, and color scales.
 const xScale = scaleTime();
 const yScale = scaleLinear();
 const colorScale = scaleOrdinal().range(schemeCategory10);
 
+// The margin defining spacing around the inner visualization rectangle.
 const margin = { top: 0, bottom: 30, left: 0, right: 30 };
 
+// The d3.area path generator for StreamGraph areas.
 const streamArea = area()
   .x(d => xScale(xValue(d.data)))
   .y0(d => yScale(d[0]))
   .y1(d => yScale(d[1]))
   .curve(curveBasis);
 
+// The d3.stack layout for computing StreamGraph area shapes.
 const streamStack = stack()
   .offset(stackOffsetWiggle)
   .order(stackOrderInsideOut);
@@ -46,6 +51,7 @@ const forStacking = data => Object.keys(data)
     return d;
   });
 
+// The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
   .render((selection, props) => {
 
@@ -75,12 +81,6 @@ const StreamGraph = component('g')
         max(stacked, series => max(series, d => d[1]))
       ])
       .range([innerHeight, 0]);
-
-    // Create the single marks group element, using the General Update Pattern.
-//    let marksG = selection.selectAll('.marks-group').data([null]);
-//    marksG = marksG
-//      .enter().append('g').attr('class', 'marks-group')
-//      .merge(marksG);
 
     // Render the StreamGraph areas.
     const paths = selection.selectAll('path').data(stacked);
