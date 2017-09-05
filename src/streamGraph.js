@@ -2,7 +2,7 @@ import { component } from 'd3-component';
 import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 'd3-shape';
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
-import { extent } from 'd3-array';
+import { min, max, extent } from 'd3-array';
 
 const xValue = d => d.date;
 
@@ -57,7 +57,15 @@ const StreamGraph = component()
       .domain(extent(stacked[0], d => {console.log(d); return xValue(d.data)}))
       .range([0, innerWidth]);
 
-    console.log(xScale.range());
+    yScale
+      .domain([
+        min(stacked, series => min(series, d => d[0])),
+        max(stacked, series => max(series, d => d[1]))
+      ])
+      .range([innerHeight, 0]);
+
+    console.log(yScale.domain());
+    console.log(yScale.range());
   });
 
 export default StreamGraph;
