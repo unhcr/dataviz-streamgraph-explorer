@@ -1,24 +1,16 @@
 import { component } from 'd3-component';
-import {
-  area,
-  curveBasis,
-  stack,
-  stackOffsetWiggle,
-  stackOrderInsideOut
-} from 'd3-shape';
-import {
-  scaleTime,
-  scaleLinear,
-  scaleOrdinal,
-  schemeCategory10,
-} from 'd3-scale';
+import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 'd3-shape';
+import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
+import { extent } from 'd3-array';
 
 const xValue = d => d.date;
 
 const xScale = scaleTime();
 const yScale = scaleLinear();
 const colorScale = scaleOrdinal().range(schemeCategory10);
+
+const margin = { top: 0, bottom: 30, left: 0, right: 30 };
 
 const streamArea = area()
   .x(d => xScale(xValue(d.data)))
@@ -53,12 +45,19 @@ const forStacking = data => Object.keys(data)
 const StreamGraph = component()
   .render((selection, props) => {
     const data = props.data;
-    const box = props.data;
+    const box = props.box;
     const stacked = streamStack
       .keys(computeKeys(data))
       (forStacking(data));
 
-    console.log(stacked);
+    const innerWidth = box.width - margin.right - margin.left;
+    const innerHeight = box.height - margin.top - margin.bottom;
+
+    xScale
+      .domain(extent(stacked[0], d => {console.log(d); return xValue(d.data)}))
+      .range([0, innerWidth]);
+
+    console.log(xScale.range());
   });
 
 export default StreamGraph;
