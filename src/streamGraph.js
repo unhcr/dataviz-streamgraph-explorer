@@ -22,6 +22,10 @@ const streamStack = stack()
   .offset(stackOffsetWiggle)
   .order(stackOrderInsideOut);
 
+// Use zero when there is no value present in the data
+// for a certain combination of (year, src, dest).
+streamStack.value((d, key) => (d[key] || 0));
+
 // This function computes the keys present in the data.
 const computeKeys = data => {
   const keysSet = set();
@@ -42,7 +46,7 @@ const forStacking = data => Object.keys(data)
     return d;
   });
 
-const StreamGraph = component()
+const StreamGraph = component('g')
   .render((selection, props) => {
     const data = props.data;
     const box = props.box;
@@ -54,7 +58,7 @@ const StreamGraph = component()
     const innerHeight = box.height - margin.top - margin.bottom;
 
     xScale
-      .domain(extent(stacked[0], d => {console.log(d); return xValue(d.data)}))
+      .domain(extent(stacked[0], d => xValue(d.data)))
       .range([0, innerWidth]);
 
     yScale
@@ -64,8 +68,24 @@ const StreamGraph = component()
       ])
       .range([innerHeight, 0]);
 
-    console.log(yScale.domain());
-    console.log(yScale.range());
+    //console.log(yScale.domain());
+    //console.log(yScale.range());
+
+    // Create the single marks group element, using the General Update Pattern.
+//    let marksG = selection.selectAll('.marks-group').data([null]);
+//    marksG = marksG
+//      .enter().append('g').attr('class', 'marks-group')
+//      .merge(marksG);
+
+    const paths = selection.selectAll('path').data(stacked);
+    const pathsEnter = paths
+      .enter().append('path');
+    pathsEnter.merge(paths)
+        .attr('fill', d => colorScale(d.index))
+        .attr('stroke', d => colorScale(d.index))
+        .attr('d', streamArea);
+
+//    console.log(streamArea(stacked[4]));
   });
 
 export default StreamGraph;

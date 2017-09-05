@@ -16,7 +16,6 @@ const detailsSVG = select('#details').append('svg');
 focusSVG.style('background-color', 'pink');
 detailsSVG.style('background-color', 'pink');
 
-
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
 
