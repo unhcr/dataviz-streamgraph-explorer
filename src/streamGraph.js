@@ -36,7 +36,9 @@ const computeKeys = data => {
   const keysSet = set();
   Object.keys(data).forEach(year => {
     Object.keys(data[year]).forEach(key => {
-      keysSet.add(key);
+      if (key !== 'date') {
+        keysSet.add(key);
+      }
     });
   });
   return keysSet.values();
