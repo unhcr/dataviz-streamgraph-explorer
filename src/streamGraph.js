@@ -48,19 +48,27 @@ const forStacking = data => Object.keys(data)
 
 const StreamGraph = component('g')
   .render((selection, props) => {
+
+    // Unpack the properties passed in.
     const data = props.data;
     const box = props.box;
+
+    // Translate the SVG group by (x, y) from the box.
+    selection.attr('transform', `translate(${box.x},${box.y})`);
+
+    // Compute the stacked data (StreamGraph areas).
     const stacked = streamStack
       .keys(computeKeys(data))
       (forStacking(data));
 
+    // Compute the dimensions of the inner rectangle.
     const innerWidth = box.width - margin.right - margin.left;
     const innerHeight = box.height - margin.top - margin.bottom;
 
+    // Set the domain and range of x and y scales.
     xScale
       .domain(extent(stacked[0], d => xValue(d.data)))
       .range([0, innerWidth]);
-
     yScale
       .domain([
         min(stacked, series => min(series, d => d[0])),
@@ -68,15 +76,13 @@ const StreamGraph = component('g')
       ])
       .range([innerHeight, 0]);
 
-    //console.log(yScale.domain());
-    //console.log(yScale.range());
-
     // Create the single marks group element, using the General Update Pattern.
 //    let marksG = selection.selectAll('.marks-group').data([null]);
 //    marksG = marksG
 //      .enter().append('g').attr('class', 'marks-group')
 //      .merge(marksG);
 
+    // Render the StreamGraph areas.
     const paths = selection.selectAll('path').data(stacked);
     const pathsEnter = paths
       .enter().append('path');
@@ -84,8 +90,6 @@ const StreamGraph = component('g')
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
         .attr('d', streamArea);
-
-//    console.log(streamArea(stacked[4]));
   });
 
 export default StreamGraph;

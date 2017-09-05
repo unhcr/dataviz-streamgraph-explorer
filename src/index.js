@@ -8,8 +8,6 @@ import StreamGraph from './streamGraph';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
-const srcStreamG = focusSVG.append('g');
-const destStreamG = focusSVG.append('g');
 const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
@@ -103,6 +101,10 @@ dataFlow('testing', (srcData, destData) => {
   console.log(destData);
 }, 'srcData, destData');
 
-dataFlow('srcStream', (data, box) => {
-  srcStreamG.call(StreamGraph, {data, box});
-}, 'srcData, srcStreamBox');
+// Render the source and destination StreamGraphs.
+dataFlow((srcData, srcStreamBox, destData, destStreamBox) => {
+  focusSVG.call(StreamGraph, [
+    { data: srcData, box: srcStreamBox },
+    { data: destData, box: destStreamBox }
+  ]);
+}, 'srcData, srcStreamBox, destData, destStreamBox');
