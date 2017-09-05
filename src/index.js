@@ -4,6 +4,7 @@ import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
+import StreamGraph from './streamGraph';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -54,15 +55,28 @@ dataFlow('layout', computeLayout, 'mobile, windowBox');
 dataFlow('focusBox', layout => layout.focusBox, 'layout');
 dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
 
+// Compute the boxes for the srcStream and destStream.
+dataFlow('srcStreamBox', focusBox => ({
+  x: 0,
+  y: 0,
+  width: focusBox.width,
+  height: focusBox.height / 2
+}), 'focusBox');
+dataFlow('destStreamBox', focusBox => ({
+  x: 0,
+  y: focusBox.height / 2,
+  width: focusBox.width,
+  height: focusBox.height / 2
+}), 'focusBox');
+
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
   focusSVG
     .attr('width', focusBox.width)
     .attr('height', focusBox.height);
 }, 'focusBox');
-
 dataFlow('detailsSVGSize', detailsBox => {
-  select('#details svg')
+  detailsSVG
     .attr('width', detailsBox.width)
     .attr('height', detailsBox.height);
 }, 'detailsBox');
@@ -89,3 +103,7 @@ dataFlow('testing', (srcData, destData) => {
   console.log("Data aggregated by destination");
   console.log(destData);
 }, 'srcData, destData');
+
+dataFlow('srcStream', (data, box) => {
+  srcStreamG.call(StreamGraph, {data, box});
+}, 'srcData, srcStreamBox');
