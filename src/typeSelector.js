@@ -13,8 +13,12 @@ const radioButtonInput = component('input')
 
 // The component for radio button label fields.
 const radioButtonLabel = component('label')
-  .render((selection, fieldName) => {
-    selection.text(fieldName);
+  .render((selection, d) => {
+    selection
+        .text(d.type)
+        .style('cursor', 'pointer')
+        .style('user-select', 'none')
+        .on('click', d.onClick);
   });
 
 // The component for radio button containers.
@@ -22,7 +26,7 @@ const radioButton = component('div', 'ui radio checkbox')
   .render((selection, d) => {
     selection
       .call(radioButtonInput, d)
-      .call(radioButtonLabel, d.type);
+      .call(radioButtonLabel, d);
   });
 
 // The component for individual fields.

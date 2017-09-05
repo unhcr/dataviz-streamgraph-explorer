@@ -22,7 +22,19 @@ dataFlow('apiQuery', { src: null, dest: null, types: null });
 // an object containing properties 'srcData' and 'destData'.
 dataFlow('apiResponse');
 
+// The selected population types.
+// TODO derive this from the URL.
+dataFlow('types', [ 'Refugees', 'Stateless persons', 'IDPs' ]);
 
+// TODO derive this from the data.
+dataFlow('availableTypes', [
+  'Refugees',
+  'Asylum-seekers',
+  'IDPs',
+  'Returnees',
+  'Stateless persons',
+  'Other persons of concern'
+]);
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
@@ -87,28 +99,11 @@ dataFlow('testing', (srcData, destData) => {
 }, 'srcData, destData');
 
 // Render the type selector buttons.
-select('#typeSelector').call(typeSelector, {
-  // TODO derive this from the data.
-  availableTypes: [
-    'Refugees',
-    'Asylum-seekers',
-    'IDPs',
-    'Returnees',
-    'Stateless persons',
-    'Other persons of concern'
-  ],
-  // TODO derive selected types from the dataflow graph.
-  selectedTypes: [
-    'Refugees',
-    'Stateless persons',
-    'IDPs'
-  ],
-  onReset: () => {
-    // TODO propagate this change into the data flow graph.
-    console.log('Reset selection');
-  },
-  onChange: selectedTypes => {
-    // TODO propagate this change into the data flow graph.
-    console.log('Selection changed to ' + selectedTypes);
-  }
-});
+dataFlow('typeSelector', (types, availableTypes) => {
+  select('#typeSelector').call(typeSelector, {
+    availableTypes,
+    selectedTypes: types,
+    onReset: () => dataFlow.types(availableTypes),
+    onChange: dataFlow.types
+  });
+}, 'types, availableTypes');
