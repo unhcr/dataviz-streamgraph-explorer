@@ -18,10 +18,10 @@ const getUnpackedData = (callback) => {
 };
 
 const aggregate = (data, column) => nest()
-  .key(d => d[column])
   .key(d => d.year)
+  .key(d => d[column])
   .rollup(values => sum(values, d => d.value))
-  .entries(data);
+  .object(data);
 
 onmessage = function(e) {
 

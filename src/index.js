@@ -4,7 +4,16 @@ import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
+import StreamGraph from './streamGraph';
 import typeSelector from './typeSelector';
+
+// Scaffold DOM structure.
+const focusSVG = select('#focus').append('svg');
+const detailsSVG = select('#details').append('svg');
+
+// Set background color to be pink so we can see the SVGs (temporary).
+focusSVG.style('background-color', 'pink');
+detailsSVG.style('background-color', 'pink');
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -58,22 +67,31 @@ dataFlow('layout', computeLayout, 'mobile, windowBox');
 dataFlow('focusBox', layout => layout.focusBox, 'layout');
 dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
 
+// Compute the boxes for the srcStream and destStream.
+dataFlow('srcStreamBox', focusBox => ({
+  x: 0,
+  y: 0,
+  width: focusBox.width,
+  height: focusBox.height / 2
+}), 'focusBox');
+dataFlow('destStreamBox', focusBox => ({
+  x: 0,
+  y: focusBox.height / 2,
+  width: focusBox.width,
+  height: focusBox.height / 2
+}), 'focusBox');
+
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
-  select('#focus svg')
+  focusSVG
     .attr('width', focusBox.width)
     .attr('height', focusBox.height);
 }, 'focusBox');
-
 dataFlow('detailsSVGSize', detailsBox => {
-  select('#details svg')
+  detailsSVG
     .attr('width', detailsBox.width)
     .attr('height', detailsBox.height);
 }, 'detailsBox');
-
-// Set background color to be pink so we can see the SVGs (temporary).
-select('#focus svg').style('background-color', 'pink');
-select('#details svg').style('background-color', 'pink');
 
 //TODO change this one line to use the real API when it's ready.
 const api = apiSimulation;
@@ -97,6 +115,14 @@ dataFlow('testing', (srcData, destData) => {
   console.log("Data aggregated by destination");
   console.log(destData);
 }, 'srcData, destData');
+
+// Render the source and destination StreamGraphs.
+dataFlow((srcData, srcStreamBox, destData, destStreamBox) => {
+  focusSVG.call(StreamGraph, [
+    { data: srcData, box: srcStreamBox },
+    { data: destData, box: destStreamBox }
+  ]);
+}, 'srcData, srcStreamBox, destData, destStreamBox');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
