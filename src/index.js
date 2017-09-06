@@ -5,6 +5,7 @@ import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
 import StreamGraph from './streamGraph';
+import typeSelector from './typeSelector';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -29,6 +30,20 @@ dataFlow('apiQuery', { src: null, dest: null, types: null });
 // The response that comes back from the API,
 // an object containing properties 'srcData' and 'destData'.
 dataFlow('apiResponse');
+
+// The selected population types.
+// TODO derive this from the URL.
+dataFlow('types', [ 'Refugees', 'Stateless persons', 'IDPs' ]);
+
+// TODO derive this from the data.
+dataFlow('availableTypes', [
+  'Refugees',
+  'Asylum-seekers',
+  'IDPs',
+  'Returnees',
+  'Stateless persons',
+  'Other persons of concern'
+]);
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
@@ -108,3 +123,13 @@ dataFlow((srcData, srcStreamBox, destData, destStreamBox) => {
     { data: destData, box: destStreamBox }
   ]);
 }, 'srcData, srcStreamBox, destData, destStreamBox');
+
+// Render the type selector buttons.
+dataFlow('typeSelector', (types, availableTypes) => {
+  select('#typeSelector').call(typeSelector, {
+    availableTypes,
+    selectedTypes: types,
+    onReset: () => dataFlow.types(availableTypes),
+    onChange: dataFlow.types
+  });
+}, 'types, availableTypes');
