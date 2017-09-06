@@ -4,6 +4,7 @@ import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
+import typeSelector from './typeSelector';
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -21,7 +22,19 @@ dataFlow('apiQuery', { src: null, dest: null, types: null });
 // an object containing properties 'srcData' and 'destData'.
 dataFlow('apiResponse');
 
+// The selected population types.
+// TODO derive this from the URL.
+dataFlow('types', [ 'Refugees', 'Stateless persons', 'IDPs' ]);
 
+// TODO derive this from the data.
+dataFlow('availableTypes', [
+  'Refugees',
+  'Asylum-seekers',
+  'IDPs',
+  'Returnees',
+  'Stateless persons',
+  'Other persons of concern'
+]);
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
@@ -84,3 +97,13 @@ dataFlow('testing', (srcData, destData) => {
   console.log("Data aggregated by destination");
   console.log(destData);
 }, 'srcData, destData');
+
+// Render the type selector buttons.
+dataFlow('typeSelector', (types, availableTypes) => {
+  select('#typeSelector').call(typeSelector, {
+    availableTypes,
+    selectedTypes: types,
+    onReset: () => dataFlow.types(availableTypes),
+    onChange: dataFlow.types
+  });
+}, 'types, availableTypes');
