@@ -45,15 +45,18 @@ dataFlow('availableTypes', [
   'Stateless'
 ]);
 
+// The currently selected source and destination.
+// This changes when clicking on areas in the StreamGraphs.
+dataFlow('src', null);
+dataFlow('dest', null);
 
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
-// TODO derive this from the URL via data flow graph.
-dataFlow('apiQuery', types => ({
-  src: null,
-  dest: null,
+dataFlow('apiQuery', (types, src, dest) => ({
+  src,
+  dest,
   types
-}), 'types');
+}), 'types, src, dest');
 
 // The response that comes back from the API,
 // an object containing properties 'srcData' and 'destData'.
@@ -133,8 +136,16 @@ dataFlow('testing', (srcData, destData) => {
 // Render the source and destination StreamGraphs.
 dataFlow((srcData, srcStreamBox, destData, destStreamBox) => {
   focusSVG.call(StreamGraph, [
-    { data: srcData, box: srcStreamBox },
-    { data: destData, box: destStreamBox }
+    {
+      data: srcData,
+      box: srcStreamBox,
+      onStreamClick: dataFlow.src
+    },
+    {
+      data: destData,
+      box: destStreamBox,
+      onStreamClick: dataFlow.dest
+    }
   ]);
 }, 'srcData, srcStreamBox, destData, destStreamBox');
 

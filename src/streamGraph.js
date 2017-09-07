@@ -60,6 +60,7 @@ const StreamGraph = component('g')
     // Unpack the properties passed in.
     const data = props.data;
     const box = props.box;
+    const onStreamClick = props.onStreamClick;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -92,7 +93,8 @@ const StreamGraph = component('g')
       .merge(paths)
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
-        .attr('d', streamArea);
+        .attr('d', streamArea)
+        .on('click', d => onStreamClick(d.key));
     paths.exit().remove();
   });
 

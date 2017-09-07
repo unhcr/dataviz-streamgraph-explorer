@@ -26,9 +26,18 @@ const aggregate = (data, column) => nest()
 onmessage = function(e) {
   const query = e.data;
   const typesSet = set(query.types);
+  const src = query.src;
+  const dest = query.dest;
 
   getUnpackedData(data => {
-    const filtered = data.filter(d => typesSet.has(d.type));
+    let filtered = data.filter(d => typesSet.has(d.type));
+    console.log(data[0]);
+    if (src) {
+      filtered = filtered.filter(d => d.src === src);
+    }
+    if (dest) {
+      filtered = filtered.filter(d => d.dest === dest);
+    }
     postMessage({
       srcData: aggregate(filtered, 'src'),
       destData: aggregate(filtered, 'dest')
