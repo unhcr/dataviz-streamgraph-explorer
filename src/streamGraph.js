@@ -88,10 +88,12 @@ const StreamGraph = component('g')
     const paths = selection.selectAll('path').data(stacked);
     const pathsEnter = paths
       .enter().append('path');
-    pathsEnter.merge(paths)
+    pathsEnter
+      .merge(paths)
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
         .attr('d', streamArea);
+    paths.exit().remove();
   });
 
 export default StreamGraph;
