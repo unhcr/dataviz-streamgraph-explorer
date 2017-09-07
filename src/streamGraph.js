@@ -94,6 +94,7 @@ const StreamGraph = component('g')
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
         .attr('d', streamArea)
+        .style('cursor', 'pointer')
         .on('click', d => onStreamClick(d.key));
     paths.exit().remove();
   });
