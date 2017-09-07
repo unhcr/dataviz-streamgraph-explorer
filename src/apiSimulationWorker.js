@@ -1,6 +1,6 @@
 import unpackData from './unpackData';
 import { json } from 'd3-request';
-import { nest } from 'd3-collection';
+import { nest, set } from 'd3-collection';
 import { sum } from 'd3-array';
 
 // Calls the callback with the cached unpacked data if it is available.
@@ -24,14 +24,14 @@ const aggregate = (data, column) => nest()
   .object(data);
 
 onmessage = function(e) {
-
-  // TODO use this query for filtering.
   const query = e.data;
+  const typesSet = set(query.types);
 
   getUnpackedData(data => {
+    const filtered = data.filter(d => typesSet.has(d.type));
     postMessage({
-      srcData: aggregate(data, 'src'),
-      destData: aggregate(data, 'dest')
+      srcData: aggregate(filtered, 'src'),
+      destData: aggregate(filtered, 'dest')
     });
   });
 }

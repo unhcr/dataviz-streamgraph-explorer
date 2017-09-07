@@ -22,28 +22,42 @@ const dataFlow = ReactiveModel();
 // representing the dimensions of the browser window.
 dataFlow('windowBox');
 
+// The selected population types.
+// TODO derive this from the URL.
+dataFlow('types', [
+  'Refugees (incl. refugee-like situations)',
+  'Returnees',
+  'Internally displaced persons',
+  'Returned IDPs',
+  'Others of concern',
+  'Asylum-seekers',
+  'Stateless'
+]);
+
+// TODO derive this from the data.
+dataFlow('availableTypes', [
+  'Refugees (incl. refugee-like situations)',
+  'Returnees',
+  'Internally displaced persons',
+  'Returned IDPs',
+  'Others of concern',
+  'Asylum-seekers',
+  'Stateless'
+]);
+
+
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
 // TODO derive this from the URL via data flow graph.
-dataFlow('apiQuery', { src: null, dest: null, types: null });
+dataFlow('apiQuery', types => ({
+  src: null,
+  dest: null,
+  types
+}), 'types');
 
 // The response that comes back from the API,
 // an object containing properties 'srcData' and 'destData'.
 dataFlow('apiResponse');
-
-// The selected population types.
-// TODO derive this from the URL.
-dataFlow('types', [ 'Refugees', 'Stateless persons', 'IDPs' ]);
-
-// TODO derive this from the data.
-dataFlow('availableTypes', [
-  'Refugees',
-  'Asylum-seekers',
-  'IDPs',
-  'Returnees',
-  'Stateless persons',
-  'Other persons of concern'
-]);
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
