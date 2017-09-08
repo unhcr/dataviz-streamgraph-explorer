@@ -96,10 +96,17 @@ const StreamGraph = component('g')
         .attr('d', streamArea)
         .style('cursor', 'pointer')
         .on('click', d => {
-          if (stacked.length === 1) {
-            onStreamClick(null);
-          } else {
+
+          // When the user clicks on an area,
+          if (stacked.length !== 1) {
+
+            // pass the key of that area to the click callback.
             onStreamClick(d.key);
+          } else {
+
+            // But if there's only one area and the user clicks on it,
+            // pass null to the click callback to signal de-selection.
+            onStreamClick(null);
           }
         });
     paths.exit().remove();
