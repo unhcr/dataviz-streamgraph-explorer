@@ -23,21 +23,34 @@ const aggregate = (data, column) => nest()
   .rollup(values => sum(values, d => d.value))
   .object(data);
 
+// When we get a request from the main page...
 onmessage = function(e) {
+
+  // Unpack the query object.
   const query = e.data;
-  const typesSet = set(query.types);
   const src = query.src;
   const dest = query.dest;
 
+  // Make a d3-set containing the selected types.
+  const typesSet = set(query.types);
+
+  // Filter and aggregate the data based on the query.
   getUnpackedData(data => {
+
+    // Filter by selected types.
     let filtered = data.filter(d => typesSet.has(d.type));
-    console.log(data[0]);
+
+    // Filter by source.
     if (src) {
       filtered = filtered.filter(d => d.src === src);
     }
+
+    // Filter by destination.
     if (dest) {
       filtered = filtered.filter(d => d.dest === dest);
     }
+
+    // Return the result to the requester via `postMessage`.
     postMessage({
       srcData: aggregate(filtered, 'src'),
       destData: aggregate(filtered, 'dest')
