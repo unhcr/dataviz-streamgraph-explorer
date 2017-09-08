@@ -53,6 +53,17 @@ const forStacking = data => Object.keys(data)
     return d;
   });
 
+// The d3-component for the background rectangle, which intercepts mouse events.
+const backgroundRect = component('rect')
+  .render((selection, props) => {
+    selection
+        .attr('width', props.width)
+        .attr('height', props.height)
+        .attr('fill-opacity', 0)
+        .style('cursor', 'pointer')
+        .on('click', props.onClick);
+  });
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
   .render((selection, props) => {
@@ -64,6 +75,16 @@ const StreamGraph = component('g')
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
+
+    // Render the background rectangle, for intercepting mouse events.
+    selection.call(backgroundRect, {
+      width: box.width,
+      height: box.height,
+      onClick: () => {
+        // Pass null to the click callback to signal de-selection.
+        onStreamClick(null);
+      }
+    });
 
     // Compute the stacked data (StreamGraph areas).
     const stacked = streamStack
