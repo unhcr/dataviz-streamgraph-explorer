@@ -33,7 +33,7 @@ export default function reduceData (data) {
   const countriesToInclude = entries
 
     // Sort the entries by value.
-    .sort((a, b) => descending(a[1], b[1]))
+    .sort((a, b) => descending(value(a), value(b)))
 
     // Take the top N.
     .slice(0, maxCountriesToInclude)
