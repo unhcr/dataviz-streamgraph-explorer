@@ -53,6 +53,18 @@ const forStacking = data => Object.keys(data)
     return d;
   });
 
+// The d3-component for the background rectangle, which intercepts mouse events.
+const doNothing = () => {};
+const backgroundRect = component('rect')
+  .render((selection, props) => {
+    selection
+        .attr('width', props.width)
+        .attr('height', props.height)
+        .attr('fill-opacity', 0)
+        .style('cursor', props.clickable ? 'pointer' : 'default')
+        .on('click', props.clickable ? props.onClick : doNothing)
+  });
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
   .render((selection, props) => {
@@ -60,6 +72,7 @@ const StreamGraph = component('g')
     // Unpack the properties passed in.
     const data = props.data;
     const box = props.box;
+    const onStreamClick = props.onStreamClick;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -68,6 +81,18 @@ const StreamGraph = component('g')
     const stacked = streamStack
       .keys(computeKeys(data))
       (forStacking(data));
+
+    // Render the background rectangle, for intercepting mouse events.
+    selection.call(backgroundRect, {
+      width: box.width,
+      height: box.height,
+
+      // Clickability here only makes sense when there's a single area.
+      clickable: stacked.length === 1,
+
+      // Pass null to the click callback to signal de-selection.
+      onClick: () => onStreamClick(null)
+    });
 
     // Compute the dimensions of the inner rectangle.
     const innerWidth = box.width - margin.right - margin.left;
@@ -92,7 +117,22 @@ const StreamGraph = component('g')
       .merge(paths)
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
-        .attr('d', streamArea);
+        .attr('d', streamArea)
+        .style('cursor', 'pointer')
+        .on('click', d => {
+
+          // When the user clicks on an area,
+          if (stacked.length !== 1) {
+
+            // pass the key of that area to the click callback.
+            onStreamClick(d.key);
+          } else {
+
+            // But if there's only one area and the user clicks on it,
+            // pass null to the click callback to signal de-selection.
+            onStreamClick(null);
+          }
+        });
     paths.exit().remove();
   });
 
