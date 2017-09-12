@@ -6,6 +6,7 @@ import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
 import StreamGraph from './streamGraph';
 import typeSelector from './typeSelector';
+import reduceData from './reduceData';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -125,6 +126,10 @@ api.onResponse(dataFlow.apiResponse);
 dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
+// Reduce the data to show only the largest areas.
+dataFlow('srcDataReduced', reduceData, 'srcData');
+dataFlow('destDataReduced', reduceData, 'destData');
+
 // Test that everything worked (temporary).
 dataFlow('testing', (srcData, destData) => {
   console.log("Data aggregated by source");
@@ -134,20 +139,20 @@ dataFlow('testing', (srcData, destData) => {
 }, 'srcData, destData');
 
 // Render the source and destination StreamGraphs.
-dataFlow((srcData, srcStreamBox, destData, destStreamBox) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox) => {
   focusSVG.call(StreamGraph, [
     {
-      data: srcData,
+      data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src
     },
     {
-      data: destData,
+      data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest
     }
   ]);
-}, 'srcData, srcStreamBox, destData, destStreamBox');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
