@@ -3,6 +3,7 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
+import { areaLabel } from 'd3-area-label';
 
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
@@ -134,6 +135,15 @@ const StreamGraph = component('g')
           }
         });
     paths.exit().remove();
+
+    // Render the labels.
+    const labels = selection.selectAll('text').data(stacked);
+    labels
+      .enter().append('text')
+        .attr('class', 'area-label')
+      .merge(labels)
+        .text(d => d.key)
+        .attr('transform', areaLabel(streamArea));
   });
 
 export default StreamGraph;
