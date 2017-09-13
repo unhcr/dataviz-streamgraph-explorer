@@ -112,14 +112,14 @@ const StreamGraph = component('g')
 
     // Render the StreamGraph areas.
     const paths = selection.selectAll('path').data(stacked);
-    const pathsEnter = paths
-      .enter().append('path');
-    pathsEnter
+    paths
+      .enter().append('path')
+        .style('cursor', 'pointer')
+        .attr('fill-opacity', .8)
       .merge(paths)
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
         .attr('d', streamArea)
-        .style('cursor', 'pointer')
         .on('click', d => {
 
           // When the user clicks on an area,
@@ -140,10 +140,13 @@ const StreamGraph = component('g')
     const labels = selection.selectAll('text').data(stacked);
     labels
       .enter().append('text')
-        .attr('class', 'area-label')
+        .style('pointer-events', 'none')
+        .attr('fill', 'white')
+        .attr('opacity', .7)
       .merge(labels)
         .text(d => d.key)
         .attr('transform', areaLabel(streamArea));
+    labels.exit().remove();
   });
 
 export default StreamGraph;
