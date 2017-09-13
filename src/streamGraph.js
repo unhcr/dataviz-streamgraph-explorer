@@ -3,6 +3,7 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
+import { areaLabel } from 'd3-area-label';
 
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
@@ -111,14 +112,14 @@ const StreamGraph = component('g')
 
     // Render the StreamGraph areas.
     const paths = selection.selectAll('path').data(stacked);
-    const pathsEnter = paths
-      .enter().append('path');
-    pathsEnter
+    paths
+      .enter().append('path')
+        .style('cursor', 'pointer')
+        .attr('fill-opacity', .8)
       .merge(paths)
         .attr('fill', d => colorScale(d.index))
         .attr('stroke', d => colorScale(d.index))
         .attr('d', streamArea)
-        .style('cursor', 'pointer')
         .on('click', d => {
 
           // When the user clicks on an area,
@@ -134,6 +135,18 @@ const StreamGraph = component('g')
           }
         });
     paths.exit().remove();
+
+    // Render the labels.
+    const labels = selection.selectAll('text').data(stacked);
+    labels
+      .enter().append('text')
+        .style('pointer-events', 'none')
+        .attr('fill', 'white')
+        .attr('opacity', .7)
+      .merge(labels)
+        .text(d => d.key)
+        .attr('transform', areaLabel(streamArea));
+    labels.exit().remove();
   });
 
 export default StreamGraph;
