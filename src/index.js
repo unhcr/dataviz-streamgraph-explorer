@@ -66,12 +66,7 @@ dataFlow('apiResponse');
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
 // and put the browser window box into the data flow graph.
-resize(() => {
-  dataFlow.windowBox({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-});
+resize(dataFlow.windowBox);
 
 // True if we're in a mobile device, false if desktop.
 // Computed based on the 'windowBox' value.
@@ -129,14 +124,6 @@ dataFlow('destData', d => d.destData, 'apiResponse');
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
-
-// Test that everything worked (temporary).
-dataFlow('testing', (srcData, destData) => {
-  console.log("Data aggregated by source");
-  console.log(srcData);
-  console.log("Data aggregated by destination");
-  console.log(destData);
-}, 'srcData, destData');
 
 // Render the source and destination StreamGraphs.
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox) => {
