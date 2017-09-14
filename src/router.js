@@ -1,13 +1,18 @@
 import queryString from 'query-string';
 
 export function parseParams(hash) {
-  return queryString.parse(hash);
+  const params = queryString.parse(hash);
+  return {
+    src: params.src || null,
+    dest: params.dest || null,
+    types: params.types ? JSON.parse(params.types) : null
+  };
 }
 
-export function encodeParams(src, dest, types) {
+export function encodeParams(params) {
   return queryString.stringify({
-    src,
-    dest,
-    types
+    src: params.src,
+    dest: params.dest,
+    types: JSON.stringify(params.types)
   });
 }

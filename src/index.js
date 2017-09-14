@@ -20,22 +20,6 @@ detailsSVG.style('background-color', 'pink');
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
 
-// An object with 'width' and 'height' properties
-// representing the dimensions of the browser window.
-dataFlow('windowBox');
-
-// The selected population types.
-// TODO derive this from the URL.
-dataFlow('types', [
-  'Refugees (incl. refugee-like situations)',
-  'Returnees',
-  'Internally displaced persons',
-  'Returned IDPs',
-  'Others of concern',
-  'Asylum-seekers',
-  'Stateless'
-]);
-
 // TODO derive this from the data.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
@@ -47,10 +31,27 @@ dataFlow('availableTypes', [
   'Stateless'
 ]);
 
+// This property is set on page load, and when the URL changes.
+dataFlow('urlIn', location.hash);
+
+// Parse the parameters from the URL hash.
+dataFlow('paramsIn', parseParams, 'urlIn');
+
+// The selected population types.
+// Initialized to the parameters from the URL hash.
+// This changes when the user interacts with the type selector.
+dataFlow('types', paramsIn => {
+
+  // If no types are specified in the route,
+  // then set the selected types to all available types.
+  return paramsIn.types || dataFlow.availableTypes();
+}, 'paramsIn');
+
 // The currently selected source and destination.
-// This changes when clicking on areas in the StreamGraphs.
-dataFlow('src', null);
-dataFlow('dest', null);
+// These are initialized to values from the URL hash.
+// These change when clicking on areas in the StreamGraphs.
+dataFlow('src', d => d.src, 'paramsIn');
+dataFlow('dest', d => d.dest, 'paramsIn');
 
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
@@ -63,6 +64,10 @@ dataFlow('apiQuery', (types, src, dest) => ({
 // The response that comes back from the API,
 // an object containing properties 'srcData' and 'destData'.
 dataFlow('apiResponse');
+
+// An object with 'width' and 'height' properties
+// representing the dimensions of the browser window.
+dataFlow('windowBox');
 
 // When the page loads or the browser resizes,
 // detect if we're on desktop or mobile,
@@ -154,11 +159,12 @@ dataFlow('typeSelector', (types, availableTypes) => {
 
 // Set up routing to synchronize URL hash parameters with dataflow.
 
-// This property is set on page load, and when the URL changes.
-dataFlow('urlIn', location.hash);
-dataFlow('paramsIn', parseParams, 'urlIn');
-dataFlow(d => console.log(d), 'paramsIn')
 
 // This property is set when parameter properties update
-dataFlow('urlOut', encodeParams, 'src, dest, types');
-dataFlow('urlHash', urlOut => location.hash = urlOut, 'urlOut');
+dataFlow('paramsOut', (src, dest, types) => ({
+  src, dest, types
+}), 'src, dest, types');
+
+dataFlow('urlOut', paramsOut => {
+  location.hash = encodeParams(paramsOut);
+}, 'paramsOut');
