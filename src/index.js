@@ -34,6 +34,11 @@ dataFlow('availableTypes', [
 // This property is set on page load, and when the URL changes.
 dataFlow('urlIn', location.hash);
 
+// Make the back and forward buttons work by listening to hash change.
+window.onhashchange = () => {
+  dataFlow.urlIn(location.hash);
+};
+
 // Parse the parameters from the URL hash.
 dataFlow('paramsIn', parseParams, 'urlIn');
 
