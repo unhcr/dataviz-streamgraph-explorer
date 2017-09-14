@@ -7,6 +7,13 @@ import apiSimulation from './apiSimulation';
 import StreamGraph from './streamGraph';
 import typeSelector from './typeSelector';
 import reduceData from './reduceData';
+import { getRouteParams, setRouteParams } from './router';
+
+
+setRouteParams({ foo: 'bar' });
+
+console.log(getRouteParams());
+
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
