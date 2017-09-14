@@ -7,13 +7,7 @@ import apiSimulation from './apiSimulation';
 import StreamGraph from './streamGraph';
 import typeSelector from './typeSelector';
 import reduceData from './reduceData';
-import { getRouteParams, setRouteParams } from './router';
-
-
-setRouteParams({ foo: 'bar' });
-
-console.log(getRouteParams());
-
+import { parseParams, encodeParams } from './router';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -157,3 +151,14 @@ dataFlow('typeSelector', (types, availableTypes) => {
     onChange: dataFlow.types
   });
 }, 'types, availableTypes');
+
+// Set up routing to synchronize URL hash parameters with dataflow.
+
+// This property is set on page load, and when the URL changes.
+dataFlow('urlIn', location.hash);
+dataFlow('paramsIn', parseParams, 'urlIn');
+dataFlow(d => console.log(d), 'paramsIn')
+
+// This property is set when parameter properties update
+dataFlow('urlOut', encodeParams, 'src, dest, types');
+dataFlow('urlHash', urlOut => location.hash = urlOut, 'urlOut');
