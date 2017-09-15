@@ -40,7 +40,7 @@ window.onhashchange = () => {
 };
 
 // Parse the parameters from the URL hash.
-dataFlow('paramsIn', parseParams, 'urlIn');
+dataFlow('paramsIn', parseParams, 'urlIn, availableTypes');
 
 // The selected population types.
 // Initialized to the parameters from the URL hash.
@@ -162,14 +162,8 @@ dataFlow('typeSelector', (types, availableTypes) => {
   });
 }, 'types, availableTypes');
 
-// Set up routing to synchronize URL hash parameters with dataflow.
-
-
-// This property is set when parameter properties update
-dataFlow('paramsOut', (src, dest, types) => ({
-  src, dest, types
-}), 'src, dest, types');
-
-dataFlow('urlOut', paramsOut => {
-  location.hash = encodeParams(paramsOut);
-}, 'paramsOut');
+// Update the URL when properties change.
+dataFlow('urlOut', (src, dest, types, availableTypes) => {
+  const params = { src, dest, types };
+  location.hash = encodeParams(params, availableTypes);
+}, 'src, dest, types, availableTypes');
