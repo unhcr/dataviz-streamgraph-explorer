@@ -136,20 +136,22 @@ dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
 
 // Render the source and destination StreamGraphs.
-dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent) => {
   focusSVG.call(StreamGraph, [
     {
+      timeExtent,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src
     },
     {
+      timeExtent,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest
     }
   ]);
-}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent');
 
 // Render the time panel that shows the years between the StreamGraphs.
 dataFlow((timeExtent, box) => {

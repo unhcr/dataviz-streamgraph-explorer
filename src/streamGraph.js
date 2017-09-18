@@ -75,6 +75,7 @@ const StreamGraph = component('g')
     const data = props.data;
     const box = props.box;
     const onStreamClick = props.onStreamClick;
+    const timeExtent = props.timeExtent;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -102,7 +103,7 @@ const StreamGraph = component('g')
 
     // Set the domain and range of x and y scales.
     xScale
-      .domain(extent(stacked[0], d => xValue(d.data)))
+      .domain(timeExtent)
       .range([0, innerWidth]);
     yScale
       .domain([
