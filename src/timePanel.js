@@ -4,7 +4,10 @@ import { axisBottom } from 'd3-axis';
 
 const xValue = d => d.date;
 const xScale = scaleTime();
-const xAxis = axisBottom().scale(xScale);
+const xAxis = axisBottom()
+  .scale(xScale)
+  .tickPadding(0)
+  .tickSize(0);
 
 // The d3-component for timePanel, exported from this module.
 const timePanel = component('g')
@@ -17,7 +20,10 @@ const timePanel = component('g')
         .attr('transform', `translate(0,${
           props.box.y + props.box.height / 2
         })`)
-        .call(xAxis);
+        .call(xAxis)
+      .selectAll('.tick text')
+        .attr('dy', '0.32em')
+        .style('font-size', '20pt');
   });
 
 export default timePanel;
