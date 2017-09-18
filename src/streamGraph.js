@@ -4,6 +4,7 @@ import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scal
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
 import { areaLabel } from 'd3-area-label';
+import dateFromYear from './dateFromYear';
 
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
@@ -50,7 +51,7 @@ const computeKeys = data => {
 const forStacking = data => Object.keys(data)
   .map(year => {
     const d = data[year];
-    d.date = d.date || new Date(year);
+    d.date = d.date || dateFromYear(year);
     return d;
   });
 
