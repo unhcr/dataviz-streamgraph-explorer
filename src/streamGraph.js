@@ -14,9 +14,6 @@ const xScale = scaleTime();
 const yScale = scaleLinear();
 const colorScale = scaleOrdinal().range(schemeCategory10);
 
-// The margin defining spacing around the inner visualization rectangle.
-const margin = { top: 0, bottom: 0, left: 0, right: 0 };
-
 // The d3.area path generator for StreamGraph areas.
 const streamArea = area()
   .x(d => xScale(xValue(d.data)))
@@ -76,6 +73,7 @@ const StreamGraph = component('g')
     const box = props.box;
     const onStreamClick = props.onStreamClick;
     const timeExtent = props.timeExtent;
+    const margin = props.margin;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -104,7 +102,7 @@ const StreamGraph = component('g')
     // Set the domain and range of x and y scales.
     xScale
       .domain(timeExtent)
-      .range([0, innerWidth]);
+      .range([margin.left, innerWidth]);
     yScale
       .domain([
         min(stacked, series => min(series, d => d[0])),

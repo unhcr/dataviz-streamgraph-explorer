@@ -17,11 +17,15 @@ const focusSVG = select('#focus').append('svg');
 const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
-focusSVG.style('background-color', 'pink');
+//focusSVG.style('background-color', 'pink');
 detailsSVG.style('background-color', 'pink');
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
+
+// The margin defining spacing around the inner visualization rectangle
+// for the focus SVG (srcStream, destStream, timePanel).
+dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
 
 // TODO derive this from the data.
 dataFlow('availableTypes', [
@@ -136,27 +140,29 @@ dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
 
 // Render the source and destination StreamGraphs.
-dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
   focusSVG.call(StreamGraph, [
     {
+      margin,
       timeExtent,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src
     },
     {
+      margin,
       timeExtent,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest
     }
   ]);
-}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box) => {
-  focusSVG.call(timePanel, { timeExtent, box });
-}, 'timeExtent, focusBox');
+dataFlow((timeExtent, box, margin) => {
+  focusSVG.call(timePanel, { timeExtent, box, margin });
+}, 'timeExtent, focusBox, focusMargin');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
