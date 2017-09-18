@@ -3,12 +3,12 @@ import queryString from 'query-string';
 function parseTypes(types, availableTypes) {
   return types
     .split('-')
-    .map(i => availableTypes[i]);
+    .map(i => availableTypes[i - 1]);
 }
 
 function encodeTypes(types, availableTypes) {
   return types
-    .map(type => availableTypes.indexOf(type))
+    .map(type => availableTypes.indexOf(type) + 1)
     .join('-');
 }
 
