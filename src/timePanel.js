@@ -23,10 +23,13 @@ const timePanel = component('g')
         .attr('transform', `translate(0,${
           props.box.y + props.box.height / 2
         })`)
-        .call(xAxis)
-      .selectAll('.tick text')
+        .call(xAxis);
+
+    // Customize the text appearance.
+    selection.selectAll('.tick text')
         .attr('dy', '0.32em')
-        .style('font-size', '20pt');
+        .style('font-size', '20pt')
+        .style('fill', '#585858');
 
     // Remove the line going along the axis.
     selection.selectAll('.domain').remove();
@@ -34,7 +37,9 @@ const timePanel = component('g')
     // Make the tick lines go from top to bottom.
     selection.selectAll('.tick line')
         .attr('y1', -props.box.height / 2)
-        .attr('y2', props.box.height / 2);
+        .attr('y2', props.box.height / 2)
+        .style('stroke', '#ddd')
+        .style('stroke-width', 2);
   });
 
 export default timePanel;
