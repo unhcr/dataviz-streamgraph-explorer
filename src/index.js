@@ -152,12 +152,9 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox) => {
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, timePanelBox) => {
-  focusSVG.call(timePanel, {
-    timeExtent,
-    box: timePanelBox
-  });
-}, 'timeExtent, timePanelBox');
+dataFlow((timeExtent, box) => {
+  focusSVG.call(timePanel, { timeExtent, box });
+}, 'timeExtent, focusBox');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
