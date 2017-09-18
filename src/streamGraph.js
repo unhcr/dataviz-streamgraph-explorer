@@ -15,7 +15,7 @@ const yScale = scaleLinear();
 const colorScale = scaleOrdinal().range(schemeCategory10);
 
 // The margin defining spacing around the inner visualization rectangle.
-const margin = { top: 0, bottom: 30, left: 0, right: 30 };
+const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
 // The d3.area path generator for StreamGraph areas.
 const streamArea = area()
