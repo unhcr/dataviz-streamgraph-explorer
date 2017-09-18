@@ -1,24 +1,31 @@
 import ReactiveModel from 'reactive-model';
 import { select } from 'd3-selection';
+import { extent } from 'd3-array';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
 import apiSimulation from './apiSimulation';
 import StreamGraph from './streamGraph';
+import timePanel from './timePanel';
 import typeSelector from './typeSelector';
 import reduceData from './reduceData';
 import { parseParams, encodeParams } from './router';
+import dateFromYear from './dateFromYear';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
 const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
-focusSVG.style('background-color', 'pink');
+//focusSVG.style('background-color', 'pink');
 detailsSVG.style('background-color', 'pink');
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
+
+// The margin defining spacing around the inner visualization rectangle
+// for the focus SVG (srcStream, destStream, timePanel).
+dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
 
 // TODO derive this from the data.
 dataFlow('availableTypes', [
@@ -90,20 +97,10 @@ dataFlow('layout', computeLayout, 'mobile, windowBox');
 // Unpack the layout object into the data flow graph.
 dataFlow('focusBox', layout => layout.focusBox, 'layout');
 dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
-
-// Compute the boxes for the srcStream and destStream.
-dataFlow('srcStreamBox', focusBox => ({
-  x: 0,
-  y: 0,
-  width: focusBox.width,
-  height: focusBox.height / 2
-}), 'focusBox');
-dataFlow('destStreamBox', focusBox => ({
-  x: 0,
-  y: focusBox.height / 2,
-  width: focusBox.width,
-  height: focusBox.height / 2
-}), 'focusBox');
+dataFlow('focusArrangement', layout => layout.focusArrangement, 'layout');
+dataFlow('srcStreamBox', d => d.srcStream, 'focusArrangement');
+dataFlow('destStreamBox', d => d.destStream, 'focusArrangement');
+dataFlow('timePanelBox', d => d.timePanel, 'focusArrangement');
 
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
@@ -132,25 +129,40 @@ api.onResponse(dataFlow.apiResponse);
 dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
+// Compute the time extent from the source data,
+// which should always match with the extent of the dest data.
+dataFlow('timeExtent', srcData => {
+  return extent(Object.keys(srcData).map(dateFromYear));
+}, 'srcData');
+
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
 
 // Render the source and destination StreamGraphs.
-dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
   focusSVG.call(StreamGraph, [
     {
+      margin,
+      timeExtent,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src
     },
     {
+      margin,
+      timeExtent,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest
     }
   ]);
-}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
+
+// Render the time panel that shows the years between the StreamGraphs.
+dataFlow((timeExtent, box, margin) => {
+  focusSVG.call(timePanel, { timeExtent, box, margin });
+}, 'timeExtent, focusBox, focusMargin');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {

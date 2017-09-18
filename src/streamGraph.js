@@ -4,6 +4,7 @@ import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scal
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
 import { areaLabel } from 'd3-area-label';
+import dateFromYear from './dateFromYear';
 
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
@@ -12,9 +13,6 @@ const xValue = d => d.date;
 const xScale = scaleTime();
 const yScale = scaleLinear();
 const colorScale = scaleOrdinal().range(schemeCategory10);
-
-// The margin defining spacing around the inner visualization rectangle.
-const margin = { top: 0, bottom: 30, left: 0, right: 30 };
 
 // The d3.area path generator for StreamGraph areas.
 const streamArea = area()
@@ -50,7 +48,7 @@ const computeKeys = data => {
 const forStacking = data => Object.keys(data)
   .map(year => {
     const d = data[year];
-    d.date = d.date || new Date(year);
+    d.date = d.date || dateFromYear(year);
     return d;
   });
 
@@ -74,6 +72,8 @@ const StreamGraph = component('g')
     const data = props.data;
     const box = props.box;
     const onStreamClick = props.onStreamClick;
+    const timeExtent = props.timeExtent;
+    const margin = props.margin;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -101,8 +101,8 @@ const StreamGraph = component('g')
 
     // Set the domain and range of x and y scales.
     xScale
-      .domain(extent(stacked[0], d => xValue(d.data)))
-      .range([0, innerWidth]);
+      .domain(timeExtent)
+      .range([margin.left, innerWidth]);
     yScale
       .domain([
         min(stacked, series => min(series, d => d[0])),
