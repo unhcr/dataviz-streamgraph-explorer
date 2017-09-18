@@ -1,7 +1,6 @@
 import ReactiveModel from 'reactive-model';
 import { select } from 'd3-selection';
 import { extent } from 'd3-array';
-import { boxes } from 'd3-boxes';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
@@ -94,19 +93,10 @@ dataFlow('layout', computeLayout, 'mobile, windowBox');
 // Unpack the layout object into the data flow graph.
 dataFlow('focusBox', layout => layout.focusBox, 'layout');
 dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
-
-// Compute the arrangement of boxes.
-dataFlow('arrangement', focusBox => {
-  return boxes({
-    "orientation": "vertical",
-    "children": [ "srcStream", "timePanel", "destStream" ]
-  }, {}, focusBox);
-}, 'focusBox');
-
-// Extract the individual boxes into the data flow.
-dataFlow('srcStreamBox', d => d.srcStream, 'arrangement');
-dataFlow('destStreamBox', d => d.destStream, 'arrangement');
-dataFlow('timePanelBox', d => d.timePanel, 'arrangement');
+dataFlow('focusArrangement', layout => layout.focusArrangement, 'layout');
+dataFlow('srcStreamBox', d => d.srcStream, 'focusArrangement');
+dataFlow('destStreamBox', d => d.destStream, 'focusArrangement');
+dataFlow('timePanelBox', d => d.timePanel, 'focusArrangement');
 
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {

@@ -1,4 +1,5 @@
 import { select } from 'd3-selection';
+import { boxes } from 'd3-boxes';
 
 // These values determine the height of each SVG on mobile devices.
 const focusMobileHeight = 500;
@@ -13,14 +14,32 @@ export default function layout(mobile, windowBox) {
   const focus = select('#focus').node().getBoundingClientRect();
   const details = select('#details').node().getBoundingClientRect();
 
-  return {
-    focusBox: {
-      width: focus.width,
-      height: mobile ? focusMobileHeight : windowBox.height - focus.top
-    },
-    detailsBox: {
-      width: details.width,
-      height: mobile ? detailsMobileHeight : windowBox.height - details.top
+  const focusBox = {
+    width: focus.width,
+    height: mobile ? focusMobileHeight : windowBox.height - focus.top
+  };
+
+  const detailsBox = {
+    width: details.width,
+    height: mobile ? detailsMobileHeight : windowBox.height - details.top
+  };
+
+  const focusArrangement = boxes({
+    orientation: 'vertical',
+    children: [
+      'srcStream',
+      'timePanel',
+      'destStream'
+    ]
+  }, {
+    timePanel: {
+      size: 0.1
     }
+  }, focusBox);
+
+  return {
+    focusBox,
+    focusArrangement,
+    detailsBox
   };
 }
