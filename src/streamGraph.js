@@ -3,23 +3,10 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
+import { local } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
 import dateFromYear from './dateFromYear';
-
-// The accessor function for the X value, returns the date.
-const xValue = d => d.date;
-
-// Create the x, y, and color scales.
-const xScale = scaleTime();
-const yScale = scaleLinear();
-const colorScale = scaleOrdinal().range(schemeCategory10);
-
-// The d3.area path generator for StreamGraph areas.
-const streamArea = area()
-  .x(d => xScale(xValue(d.data)))
-  .y0(d => yScale(d[0]))
-  .y1(d => yScale(d[1]))
-  .curve(curveBasis);
+import debounce from 'lodash.debounce';
 
 // The d3.stack layout for computing StreamGraph area shapes.
 const streamStack = stack()
@@ -64,8 +51,44 @@ const backgroundRect = component('rect')
         .on('click', props.clickable ? props.onClick : doNothing)
   });
 
+// The accessor function for the X value, returns the date.
+const xValue = d => d.date;
+
+// Create the x, y, and color scales.
+const xScale = scaleTime();
+const colorScale = scaleOrdinal().range(schemeCategory10);
+
+// The d3 local that stores things local to each StreamGraph instance.
+const streamLocal = local();
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
+  .create((selection, d) => {
+
+    // Each StreamGraph instance has its own Y scale.
+    const yScale = scaleLinear();
+
+    // The d3.area path generator for StreamGraph areas.
+    const streamArea = area()
+      .x(d => xScale(xValue(d.data)))
+      .y0(d => yScale(d[0]))
+      .y1(d => yScale(d[1]))
+      .curve(curveBasis);
+
+    // The debounced function that positions and reveals labels.
+    const renderLabels = debounce(() => {
+      selection.selectAll('text')
+          .attr('transform', areaLabel(streamArea))
+          .attr('opacity', .7);
+    }, 500);
+
+    // Store the renderLabels and streamArea local to the instance.
+    streamLocal.set(selection.node(), {
+      renderLabels,
+      streamArea,
+      yScale
+    });
+  })
   .render((selection, props) => {
 
     // Unpack the properties passed in.
@@ -74,6 +97,12 @@ const StreamGraph = component('g')
     const onStreamClick = props.onStreamClick;
     const timeExtent = props.timeExtent;
     const margin = props.margin;
+
+    // Unpack local objects.
+    const my = streamLocal.get(selection.node());
+    const renderLabels = my.renderLabels;
+    const streamArea = my.streamArea;
+    const yScale = my.yScale;
 
     // Translate the SVG group by (x, y) from the box.
     selection.attr('transform', `translate(${box.x},${box.y})`);
@@ -142,11 +171,11 @@ const StreamGraph = component('g')
       .enter().append('text')
         .style('pointer-events', 'none')
         .attr('fill', 'white')
-        .attr('opacity', .7)
       .merge(labels)
         .text(d => d.key)
-        .attr('transform', areaLabel(streamArea));
+        .attr('opacity', 0);
     labels.exit().remove();
+    renderLabels();
   });
 
 export default StreamGraph;
