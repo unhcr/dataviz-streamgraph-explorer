@@ -65,6 +65,10 @@ dataFlow('types', paramsIn => {
 dataFlow('src', d => d.src, 'paramsIn');
 dataFlow('dest', d => d.dest, 'paramsIn');
 
+// The currently selected year.
+// TODO derive initial values from data max.
+dataFlow('year', 2016);
+
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
 dataFlow('apiQuery', (types, src, dest) => ({
@@ -160,9 +164,14 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin) => {
-  focusSVG.call(timePanel, { timeExtent, box, margin });
-}, 'timeExtent, focusBox, focusMargin');
+dataFlow((timeExtent, box, margin, year) => {
+  focusSVG.call(timePanel, {
+    timeExtent,
+    box,
+    margin,
+    year
+  });
+}, 'timeExtent, focusBox, focusMargin, year');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {

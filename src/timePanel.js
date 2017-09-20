@@ -1,6 +1,7 @@
 import { component } from 'd3-component';
 import { scaleTime } from 'd3-scale';
 import { axisBottom } from 'd3-axis';
+import dateFromYear from './dateFromYear';
 
 const xValue = d => d.date;
 const xScale = scaleTime();
@@ -9,13 +10,28 @@ const xAxis = axisBottom()
   .tickPadding(0)
   .tickSize(0);
 
+
+// The d3-component for the selected year line.
+const yearLine = component('line')
+  .render((selection, props) => {
+    selection
+        .attr('x1', props.x)
+        .attr('y1', props.y1)
+        .attr('x2', props.x)
+        .attr('y2', props.y2)
+        .attr('stroke', 'black')
+        .attr('stroke-width', 3);
+  });
+
 // The d3-component for timePanel, exported from this module.
 const timePanel = component('g')
   .render((selection, props) => {
+
     // Unpack the properties passed in.
     const box = props.box;
     const timeExtent = props.timeExtent;
     const margin = props.margin;
+    const year = dateFromYear(props.year);
 
     // Compute the dimensions of the inner rectangle.
     const innerWidth = box.width - margin.right - margin.left;
@@ -44,11 +60,16 @@ const timePanel = component('g')
     selection.selectAll('.domain').remove();
 
     // Make the tick lines go from top to bottom.
+    const y1 = -box.height / 2;
+    const y2 = box.height / 2;
     selection.selectAll('.tick line')
-        .attr('y1', -box.height / 2)
-        .attr('y2', box.height / 2)
+        .attr('y1', y1)
+        .attr('y2', y2)
         .style('stroke', '#ddd')
         .style('stroke-width', 2);
+
+    // Render the selected year line.
+    selection.call(yearLine, { x: xScale(year), y1, y2 });
   });
 
 export default timePanel;
