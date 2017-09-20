@@ -6,6 +6,7 @@ import { min, max, extent } from 'd3-array';
 import { local } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
 import dateFromYear from './dateFromYear';
+import backgroundRect from './backgroundRect';
 import debounce from 'lodash.debounce';
 
 // The d3.stack layout for computing StreamGraph area shapes.
@@ -37,18 +38,6 @@ const forStacking = data => Object.keys(data)
     const d = data[year];
     d.date = d.date || dateFromYear(year);
     return d;
-  });
-
-// The d3-component for the background rectangle, which intercepts mouse events.
-const doNothing = () => {};
-const backgroundRect = component('rect')
-  .render((selection, props) => {
-    selection
-        .attr('width', props.width)
-        .attr('height', props.height)
-        .attr('fill-opacity', 0)
-        .style('cursor', props.clickable ? 'pointer' : 'default')
-        .on('click', props.clickable ? props.onClick : doNothing)
   });
 
 // The accessor function for the X value, returns the date.

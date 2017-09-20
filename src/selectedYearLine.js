@@ -2,6 +2,7 @@ import { component } from 'd3-component';
 import { scaleTime } from 'd3-scale';
 import dateFromYear from './dateFromYear';
 
+// TODO refactor so the xScale is not defined in multiple places.
 const xScale = scaleTime();
 
 // The d3-component for the selected year line.
