@@ -4,7 +4,6 @@ import { component } from 'd3-component';
 const doNothing = () => {};
 const backgroundRect = component('rect')
   .render((selection, props) => {
-    console.log(selection.node());
     selection
         .attr('width', props.width)
         .attr('height', props.height)

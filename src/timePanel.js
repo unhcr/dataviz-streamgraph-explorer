@@ -1,6 +1,7 @@
 import { component } from 'd3-component';
 import { scaleTime } from 'd3-scale';
 import { axisBottom } from 'd3-axis';
+import { mouse } from 'd3-selection';
 import backgroundRect from './backgroundRect';
 
 const xValue = d => d.date;
@@ -18,6 +19,7 @@ const timePanel = component('g')
     const box = props.box;
     const timeExtent = props.timeExtent;
     const margin = props.margin;
+    const onYearSelect = props.onYearSelect;
 
     // Compute the dimensions of the inner rectangle.
     const innerWidth = box.width - margin.right - margin.left;
@@ -50,15 +52,19 @@ const timePanel = component('g')
         .attr('y1', y1)
         .attr('y2', y2)
         .style('stroke', '#ddd')
-        .style('stroke-width', 2);
+        .style('stroke-width', 2)
+        .style('pointer-events', 'none');
 
     // Render the background rectangle, for intercepting mouse events.
     selection.call(backgroundRect, {
       width: box.width,
       height: box.height,
       onMove: () => {
-        console.log('mousemove');
-      })
+        const xPixel = mouse(selection.node())[0];
+        const hoveredDate = xScale.invert(xPixel);
+        const selectedYear = hoveredDate.getFullYear();
+        onYearSelect(selectedYear);
+      }
     });
   });
 

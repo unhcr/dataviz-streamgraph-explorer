@@ -174,7 +174,11 @@ dataFlow((timeExtent, box, margin, year) => {
     timeExtent,
     box,
     margin,
-    year
+    onYearSelect: year => {
+      if(dataFlow.year() !== year) {
+        dataFlow.year(year);
+      }
+    }
   });
 }, 'timeExtent, focusBox, focusMargin, year');
 
