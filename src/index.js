@@ -11,9 +11,14 @@ import typeSelector from './typeSelector';
 import reduceData from './reduceData';
 import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
+import selectedYearLine from './selectedYearLine';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
+const focusTimePanelLayer = focusSVG.append('g');
+const focusStreamGraphLayer = focusSVG.append('g');
+const focusSelectedYearLayer = focusSVG.append('g');
+
 const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
@@ -145,7 +150,7 @@ dataFlow('destDataReduced', reduceData, 'destData');
 
 // Render the source and destination StreamGraphs.
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
-  focusSVG.call(StreamGraph, [
+  focusStreamGraphLayer.call(StreamGraph, [
     {
       margin,
       timeExtent,
@@ -165,7 +170,17 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
 
 // Render the time panel that shows the years between the StreamGraphs.
 dataFlow((timeExtent, box, margin, year) => {
-  focusSVG.call(timePanel, {
+  focusTimePanelLayer.call(timePanel, {
+    timeExtent,
+    box,
+    margin,
+    year
+  });
+}, 'timeExtent, focusBox, focusMargin, year');
+
+// Render the selected year line.
+dataFlow((timeExtent, box, margin, year) => {
+  focusSelectedYearLayer.call(selectedYearLine, {
     timeExtent,
     box,
     margin,
