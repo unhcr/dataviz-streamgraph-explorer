@@ -156,14 +156,26 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
       timeExtent,
       data: srcDataReduced,
       box: srcStreamBox,
-      onStreamClick: dataFlow.src
+      onStreamClick: dataFlow.src,
+      // TODO remove duplicated logic here
+      onYearSelect: year => {
+        if(dataFlow.year() !== year) {
+          dataFlow.year(year);
+        }
+      }
     },
     {
       margin,
       timeExtent,
       data: destDataReduced,
       box: destStreamBox,
-      onStreamClick: dataFlow.dest
+      onStreamClick: dataFlow.dest,
+      // TODO remove duplicated logic here
+      onYearSelect: year => {
+        if(dataFlow.year() !== year) {
+          dataFlow.year(year);
+        }
+      }
     }
   ]);
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
@@ -174,6 +186,7 @@ dataFlow((timeExtent, box, margin, year) => {
     timeExtent,
     box,
     margin,
+    // TODO remove duplicated logic here
     onYearSelect: year => {
       if(dataFlow.year() !== year) {
         dataFlow.year(year);

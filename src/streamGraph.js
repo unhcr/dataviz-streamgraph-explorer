@@ -3,7 +3,7 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
-import { local } from 'd3-selection';
+import { local, mouse } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
 import dateFromYear from './dateFromYear';
 import backgroundRect from './backgroundRect';
@@ -86,6 +86,7 @@ const StreamGraph = component('g')
     const onStreamClick = props.onStreamClick;
     const timeExtent = props.timeExtent;
     const margin = props.margin;
+    const onYearSelect = props.onYearSelect;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -110,7 +111,16 @@ const StreamGraph = component('g')
       clickable: stacked.length === 1,
 
       // Pass null to the click callback to signal de-selection.
-      onClick: () => onStreamClick(null)
+      onClick: () => onStreamClick(null),
+
+      // Pass selected year to the caller on hover.
+      onMove: () => {
+        // TODO reduce duplicated logic between here and timePanel
+        const xPixel = mouse(selection.node())[0];
+        const hoveredDate = xScale.invert(xPixel);
+        const selectedYear = hoveredDate.getFullYear();
+        onYearSelect(selectedYear);
+      }
     });
 
     // Compute the dimensions of the inner rectangle.

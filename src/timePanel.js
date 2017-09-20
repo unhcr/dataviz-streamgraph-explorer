@@ -60,6 +60,7 @@ const timePanel = component('g')
       width: box.width,
       height: box.height,
       onMove: () => {
+        // TODO reduce duplicated logic between here and streamGraph
         const xPixel = mouse(selection.node())[0];
         const hoveredDate = xScale.invert(xPixel);
         const selectedYear = hoveredDate.getFullYear();

@@ -31,7 +31,8 @@ const selectedYearLine = component('line')
         .attr('x2', x)
         .attr('y2', box.height)
         .attr('stroke', 'black')
-        .attr('stroke-width', 3);
+        .attr('stroke-width', 3)
+        .style('pointer-events', 'none');
   });
 
 export default selectedYearLine;
