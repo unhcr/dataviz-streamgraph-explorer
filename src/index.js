@@ -74,6 +74,11 @@ dataFlow('dest', d => d.dest, 'paramsIn');
 // TODO derive initial values from data max.
 dataFlow('year', 2016);
 
+// Render the selected year in the details panel.
+dataFlow(year => {
+  select('#details-selected-year').text(year);
+}, 'year');
+
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
 dataFlow('apiQuery', (types, src, dest) => ({
