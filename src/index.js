@@ -11,9 +11,14 @@ import typeSelector from './typeSelector';
 import reduceData from './reduceData';
 import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
+import selectedYearLine from './selectedYearLine';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
+const focusTimePanelLayer = focusSVG.append('g');
+const focusStreamGraphLayer = focusSVG.append('g');
+const focusSelectedYearLayer = focusSVG.append('g');
+
 const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
@@ -64,6 +69,15 @@ dataFlow('types', paramsIn => {
 // These change when clicking on areas in the StreamGraphs.
 dataFlow('src', d => d.src, 'paramsIn');
 dataFlow('dest', d => d.dest, 'paramsIn');
+
+// The currently selected year.
+// TODO derive initial values from data max.
+dataFlow('year', 2016);
+
+// Render the selected year in the details panel.
+dataFlow(year => {
+  select('#details-selected-year').text(year);
+}, 'year');
 
 // The query object that gets passed into the API (or API simulation)
 // that fetches the filtered and aggregated data for source and destination streams.
@@ -141,28 +155,60 @@ dataFlow('destDataReduced', reduceData, 'destData');
 
 // Render the source and destination StreamGraphs.
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
-  focusSVG.call(StreamGraph, [
+  focusStreamGraphLayer.call(StreamGraph, [
     {
       margin,
       timeExtent,
       data: srcDataReduced,
       box: srcStreamBox,
-      onStreamClick: dataFlow.src
+      onStreamClick: dataFlow.src,
+      // TODO remove duplicated logic here
+      onYearSelect: year => {
+        if(dataFlow.year() !== year) {
+          dataFlow.year(year);
+        }
+      }
     },
     {
       margin,
       timeExtent,
       data: destDataReduced,
       box: destStreamBox,
-      onStreamClick: dataFlow.dest
+      onStreamClick: dataFlow.dest,
+      // TODO remove duplicated logic here
+      onYearSelect: year => {
+        if(dataFlow.year() !== year) {
+          dataFlow.year(year);
+        }
+      }
     }
   ]);
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin) => {
-  focusSVG.call(timePanel, { timeExtent, box, margin });
-}, 'timeExtent, focusBox, focusMargin');
+dataFlow((timeExtent, box, margin, year) => {
+  focusTimePanelLayer.call(timePanel, {
+    timeExtent,
+    box,
+    margin,
+    // TODO remove duplicated logic here
+    onYearSelect: year => {
+      if(dataFlow.year() !== year) {
+        dataFlow.year(year);
+      }
+    }
+  });
+}, 'timeExtent, focusBox, focusMargin, year');
+
+// Render the selected year line.
+dataFlow((timeExtent, box, margin, year) => {
+  focusSelectedYearLayer.call(selectedYearLine, {
+    timeExtent,
+    box,
+    margin,
+    year
+  });
+}, 'timeExtent, focusBox, focusMargin, year');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {

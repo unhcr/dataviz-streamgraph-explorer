@@ -3,9 +3,10 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
-import { local } from 'd3-selection';
+import { local, mouse } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
 import dateFromYear from './dateFromYear';
+import backgroundRect from './backgroundRect';
 import debounce from 'lodash.debounce';
 
 // The d3.stack layout for computing StreamGraph area shapes.
@@ -37,18 +38,6 @@ const forStacking = data => Object.keys(data)
     const d = data[year];
     d.date = d.date || dateFromYear(year);
     return d;
-  });
-
-// The d3-component for the background rectangle, which intercepts mouse events.
-const doNothing = () => {};
-const backgroundRect = component('rect')
-  .render((selection, props) => {
-    selection
-        .attr('width', props.width)
-        .attr('height', props.height)
-        .attr('fill-opacity', 0)
-        .style('cursor', props.clickable ? 'pointer' : 'default')
-        .on('click', props.clickable ? props.onClick : doNothing)
   });
 
 // The accessor function for the X value, returns the date.
@@ -97,6 +86,7 @@ const StreamGraph = component('g')
     const onStreamClick = props.onStreamClick;
     const timeExtent = props.timeExtent;
     const margin = props.margin;
+    const onYearSelect = props.onYearSelect;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -121,7 +111,16 @@ const StreamGraph = component('g')
       clickable: stacked.length === 1,
 
       // Pass null to the click callback to signal de-selection.
-      onClick: () => onStreamClick(null)
+      onClick: () => onStreamClick(null),
+
+      // Pass selected year to the caller on hover.
+      onMove: () => {
+        // TODO reduce duplicated logic between here and timePanel
+        const xPixel = mouse(selection.node())[0];
+        const hoveredDate = xScale.invert(xPixel);
+        const selectedYear = hoveredDate.getFullYear();
+        onYearSelect(selectedYear);
+      }
     });
 
     // Compute the dimensions of the inner rectangle.
