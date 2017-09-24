@@ -1,6 +1,6 @@
 # streamgraph-explorer
 
-An interactive visualization system for exploring flow timeseries data (work in profress).
+An interactive visualization system for exploring flow timeseries data (work in progress).
 
 ## Development
 
