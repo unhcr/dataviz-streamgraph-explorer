@@ -23,11 +23,9 @@ const aggregate = (data, column) => nest()
   .rollup(values => sum(values, d => d.value))
   .object(data);
 
-// When we get a request from the main page...
-onmessage = function(e) {
+function runQuery(query, callback){
 
   // Unpack the query object.
-  const query = e.data;
   const src = query.src;
   const dest = query.dest;
 
@@ -50,10 +48,26 @@ onmessage = function(e) {
       filtered = filtered.filter(d => d.dest === dest);
     }
 
-    // Return the result to the requester via `postMessage`.
-    postMessage({
+    // Aggregate the filtered data by source and destination.
+    const result = {
       srcData: aggregate(filtered, 'src'),
       destData: aggregate(filtered, 'dest')
-    });
+    };
+
+    callback(result);
+  });
+};
+
+// When we get a request from the main page...
+onmessage = function(e) {
+
+  // The query object is passed in as e.data.
+  const query = e.data;
+
+  // Execute the query.
+  runQuery(query, result => {
+
+    // Return the result to the requester via `postMessage`.
+    postMessage(result);
   });
 }
