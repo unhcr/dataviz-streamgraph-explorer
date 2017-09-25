@@ -1,11 +1,11 @@
 import { descending, max } from 'd3-array';
 
 // The maximum number of areas to show.
-const maxCountriesToInclude = 100;
+const maxCountriesToInclude = 80;
 
 // The threshold below which areas will be excluded,
 // in terms of percentage of the maximum value seen (0.01 == 1%).
-const visibilityThreshold = 0.01;
+const visibilityThreshold = 0.02;
 
 // Accessor functions for dealing with entries clearly.
 const country = entry => entry[0];

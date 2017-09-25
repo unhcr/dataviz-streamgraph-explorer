@@ -1,59 +1,16 @@
-import unpackData from './unpackData';
-import { json } from 'd3-request';
-import { nest, set } from 'd3-collection';
-import { sum } from 'd3-array';
+import { runQuery } from './apiSimulationRunQuery';
 
-// Calls the callback with the cached unpacked data if it is available.
-// Loads and unpacks the data when first invoked.
-let data;
-const getUnpackedData = (callback) => {
-  if (data) {
-    callback(data);
-  } else {
-    json('../data/data.json', packedData => {
-      data = unpackData(packedData);
-      callback(data);
-    });
-  }
-};
-
-const aggregate = (data, column) => nest()
-  .key(d => d.year)
-  .key(d => d[column])
-  .rollup(values => sum(values, d => d.value))
-  .object(data);
-
-// When we get a request from the main page...
+// If this module is being used as a Web Worker,
+// when we get a request from the main page...
 onmessage = function(e) {
 
-  // Unpack the query object.
+  // The query object is passed in as e.data.
   const query = e.data;
-  const src = query.src;
-  const dest = query.dest;
 
-  // Make a d3-set containing the selected types.
-  const typesSet = set(query.types);
-
-  // Filter and aggregate the data based on the query.
-  getUnpackedData(data => {
-
-    // Filter by selected types.
-    let filtered = data.filter(d => typesSet.has(d.type));
-
-    // Filter by source.
-    if (src) {
-      filtered = filtered.filter(d => d.src === src);
-    }
-
-    // Filter by destination.
-    if (dest) {
-      filtered = filtered.filter(d => d.dest === dest);
-    }
+  // Execute the query.
+  runQuery(query, result => {
 
     // Return the result to the requester via `postMessage`.
-    postMessage({
-      srcData: aggregate(filtered, 'src'),
-      destData: aggregate(filtered, 'dest')
-    });
+    postMessage(result);
   });
 }

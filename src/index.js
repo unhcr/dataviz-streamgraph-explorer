@@ -47,8 +47,11 @@ dataFlow('availableTypes', [
 dataFlow('urlIn', location.hash);
 
 // Make the back and forward buttons work by listening to hash change.
+// Ignore hash changes that resulted from urlOut changing.
 window.onhashchange = () => {
-  dataFlow.urlIn(location.hash);
+  if(location.hash.substr(1) !== dataFlow.urlOut()){
+    dataFlow.urlIn(location.hash);
+  }
 };
 
 // Parse the parameters from the URL hash.
@@ -129,15 +132,15 @@ dataFlow('detailsSVGSize', detailsBox => {
 }, 'detailsBox');
 
 //TODO change this one line to use the real API when it's ready.
-const api = apiSimulation;
-
-// Post a message to the worker containing the API query
-// whenever the API query changes.
-dataFlow('apiRequest', api.sendRequest, 'apiQuery');
+const api = apiSimulation({ useWebWorker: false });
 
 // Receive the asynchronous response from the API simulation
 // and pass it into the data flow graph.
 api.onResponse(dataFlow.apiResponse);
+
+// Post a message to the worker containing the API query
+// whenever the API query changes.
+dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 
 // Unpack the API response into the data flow graph.
 dataFlow('srcData', d => d.srcData, 'apiResponse');
@@ -186,7 +189,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin, year) => {
+dataFlow((timeExtent, box, margin) => {
   focusTimePanelLayer.call(timePanel, {
     timeExtent,
     box,
@@ -198,7 +201,7 @@ dataFlow((timeExtent, box, margin, year) => {
       }
     }
   });
-}, 'timeExtent, focusBox, focusMargin, year');
+}, 'timeExtent, focusBox, focusMargin');
 
 // Render the selected year line.
 dataFlow((timeExtent, box, margin, year) => {
@@ -223,5 +226,7 @@ dataFlow('typeSelector', (types, availableTypes) => {
 // Update the URL when properties change.
 dataFlow('urlOut', (src, dest, types, availableTypes) => {
   const params = { src, dest, types };
-  location.hash = encodeParams(params, availableTypes);
+  const urlOut = encodeParams(params, availableTypes);
+  location.hash = urlOut;
+  return urlOut;
 }, 'src, dest, types, availableTypes');
