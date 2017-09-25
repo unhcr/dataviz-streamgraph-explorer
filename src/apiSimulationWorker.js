@@ -17,13 +17,29 @@ const getUnpackedData = (callback) => {
   }
 };
 
+// This function aggregates data by year
+// and by the specified column using d3.nest.
 const aggregate = (data, column) => nest()
   .key(d => d.year)
   .key(d => d[column])
   .rollup(values => sum(values, d => d.value))
   .object(data);
 
+// This object contains cached results for each query.
+const cache = {};
+const key = query => JSON.stringify(query);
+const getCachedResult = q => cache[key(q)];
+const setCachedResult = (q, result) => cache[key(q)] = result;
+
+// This function executes the query, using a cache of results.
 function runQuery(query, callback){
+
+  // Return the cached result
+  // if this query has already been computed.
+  const cachedResult = getCachedResult(query);
+  if(cachedResult){
+    return callback(cachedResult);
+  }
 
   // Unpack the query object.
   const src = query.src;
@@ -54,6 +70,7 @@ function runQuery(query, callback){
       destData: aggregate(filtered, 'dest')
     };
 
+    setCachedResult(query, result);
     callback(result);
   });
 };

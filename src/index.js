@@ -47,8 +47,11 @@ dataFlow('availableTypes', [
 dataFlow('urlIn', location.hash);
 
 // Make the back and forward buttons work by listening to hash change.
+// Ignore hash changes that resulted from urlOut changing.
 window.onhashchange = () => {
-  dataFlow.urlIn(location.hash);
+  if(location.hash.substr(1) !== dataFlow.urlOut()){
+    dataFlow.urlIn(location.hash);
+  }
 };
 
 // Parse the parameters from the URL hash.
@@ -134,6 +137,7 @@ const api = apiSimulation;
 // Post a message to the worker containing the API query
 // whenever the API query changes.
 dataFlow('apiRequest', api.sendRequest, 'apiQuery');
+dataFlow(q => console.log('query changed'), 'apiQuery');
 
 // Receive the asynchronous response from the API simulation
 // and pass it into the data flow graph.
@@ -223,5 +227,7 @@ dataFlow('typeSelector', (types, availableTypes) => {
 // Update the URL when properties change.
 dataFlow('urlOut', (src, dest, types, availableTypes) => {
   const params = { src, dest, types };
-  location.hash = encodeParams(params, availableTypes);
+  const urlOut = encodeParams(params, availableTypes);
+  location.hash = urlOut;
+  return urlOut;
 }, 'src, dest, types, availableTypes');
