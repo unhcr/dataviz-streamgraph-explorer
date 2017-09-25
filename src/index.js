@@ -132,16 +132,15 @@ dataFlow('detailsSVGSize', detailsBox => {
 }, 'detailsBox');
 
 //TODO change this one line to use the real API when it's ready.
-const api = apiSimulation;
-
-// Post a message to the worker containing the API query
-// whenever the API query changes.
-dataFlow('apiRequest', api.sendRequest, 'apiQuery');
-dataFlow(q => console.log('query changed'), 'apiQuery');
+const api = apiSimulation({ useWebWorker: false });
 
 // Receive the asynchronous response from the API simulation
 // and pass it into the data flow graph.
 api.onResponse(dataFlow.apiResponse);
+
+// Post a message to the worker containing the API query
+// whenever the API query changes.
+dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 
 // Unpack the API response into the data flow graph.
 dataFlow('srcData', d => d.srcData, 'apiResponse');
