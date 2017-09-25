@@ -186,7 +186,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin, year) => {
+dataFlow((timeExtent, box, margin) => {
   focusTimePanelLayer.call(timePanel, {
     timeExtent,
     box,
@@ -198,7 +198,7 @@ dataFlow((timeExtent, box, margin, year) => {
       }
     }
   });
-}, 'timeExtent, focusBox, focusMargin, year');
+}, 'timeExtent, focusBox, focusMargin');
 
 // Render the selected year line.
 dataFlow((timeExtent, box, margin, year) => {
