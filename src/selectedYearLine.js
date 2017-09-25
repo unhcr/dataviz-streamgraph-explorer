@@ -7,6 +7,15 @@ const xScale = scaleTime();
 
 // The d3-component for the selected year line.
 const selectedYearLine = component('line')
+  .create((selection, props) => {
+    selection
+        .attr('x1', 0)
+        .attr('x2', 0)
+        .attr('y1', 0)
+        .attr('stroke', 'black')
+        .attr('stroke-width', 3)
+        .style('pointer-events', 'none');
+  })
   .render((selection, props) => {
 
     // Unpack the properties passed in.
@@ -24,15 +33,9 @@ const selectedYearLine = component('line')
       .range([margin.left, innerWidth]);
 
     // Render the selected year line.
-    const x = xScale(year);
     selection
-        .attr('x1', x)
-        .attr('y1', 0)
-        .attr('x2', x)
         .attr('y2', box.height)
-        .attr('stroke', 'black')
-        .attr('stroke-width', 3)
-        .style('pointer-events', 'none');
+        .attr('transform', `translate(${xScale(year)})`);
   });
 
 export default selectedYearLine;
