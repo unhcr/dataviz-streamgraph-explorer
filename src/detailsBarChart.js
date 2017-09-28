@@ -25,7 +25,12 @@ export default (selection, data) => {
     .domain(data.map(yValue))
     .range([0, innerHeight]);
 
-  const rects = selection.selectAll('rect').data(data);
+  let g = selection.selectAll('g').data([null]);
+  g = g.enter().append('g')
+    .merge(g)
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const rects = g.selectAll('rect').data(data);
   rects
     .enter().append('rect')
       .attr('fill', 'steelblue')
