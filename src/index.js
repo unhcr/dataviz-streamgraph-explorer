@@ -13,6 +13,7 @@ import reduceData from './reduceData';
 import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
+import detailsBarChart from './detailsBarChart';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -148,10 +149,6 @@ dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
 
-// Render the details bar chart for the selected year.
-// TODO
-
-
 const commaFormat = format(',');
 dataFlow((year, srcData, destData) => {
   // Compute the filtered data for the selected year.
@@ -177,7 +174,8 @@ dataFlow((year, srcData, destData) => {
   select('#details-statistic-value')
       .text(commaFormat(statisticValue));
 
-  //detailsSVG.call(detailsBarChart, srcBarsData);
+  // Render the details bar chart for the selected year.
+  detailsSVG.call(detailsBarChart, srcBarsData);
 }, 'year, srcData, destData')
 
 // Compute the time extent from the source data,
