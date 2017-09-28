@@ -25,7 +25,7 @@ const detailsSVG = select('#details').append('svg');
 
 // Set background color to be pink so we can see the SVGs (temporary).
 //focusSVG.style('background-color', 'pink');
-detailsSVG.style('background-color', 'pink');
+//detailsSVG.style('background-color', 'pink');
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
