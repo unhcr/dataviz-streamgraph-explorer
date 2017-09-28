@@ -7814,7 +7814,7 @@ const getUnpackedData = (callback) => {
   if (data) {
     callback(data);
   } else {
-    Object(__WEBPACK_IMPORTED_MODULE_1_d3_request__["json"])('../data/data.json', packedData => {
+    Object(__WEBPACK_IMPORTED_MODULE_1_d3_request__["json"])('data/data.json', packedData => {
       data = Object(__WEBPACK_IMPORTED_MODULE_0__unpackData__["a" /* default */])(packedData);
       callback(data);
     });

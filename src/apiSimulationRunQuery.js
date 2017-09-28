@@ -10,7 +10,7 @@ const getUnpackedData = (callback) => {
   if (data) {
     callback(data);
   } else {
-    json('../data/data.json', packedData => {
+    json('data/data.json', packedData => {
       data = unpackData(packedData);
       callback(data);
     });
