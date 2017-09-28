@@ -5,7 +5,7 @@ const xValue = d => d.value;
 const yValue = d => d.name;
 
 const xScale = scaleLinear();
-const yScale = scaleBand();
+const yScale = scaleBand().padding(0.2);
 
 const margin = { left: 50, right: 50, top: 20, bottom: 0 };
 
@@ -30,13 +30,31 @@ export default (selection, data) => {
     .merge(g)
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-  const rects = g.selectAll('rect').data(data);
-  rects
-    .enter().append('rect')
+  // Each "bar" is a group that will contain
+  //  - a rectangle
+  //  - a label on the left (name)
+  //  - a label on the right (value)
+  const bars = g.selectAll('g').data(data);
+  const barsEnter = bars.enter().append('g');
+  bars.exit().remove();
+  bars
+    .merge(barsEnter)
+      .attr('transform', d => `translate(0,${yScale(yValue(d))})`);
+
+  // Render the rectangles.
+  barsEnter
+    .append('rect')
       .attr('fill', 'steelblue')
-    .merge(rects)
-      .attr('x', 0)
-      .attr('y', d => yScale(yValue(d)))
+    .merge(bars.select('rect'))
       .attr('width', d => xScale(xValue(d)))
       .attr('height', yScale.bandwidth());
+
+  // Render the labels on the left.
+  barsEnter
+    .append('text')
+      .attr('class', 'name-label')
+      .attr('dy', '0.32em')
+    .merge(bars.select('.name-label'))
+      .attr('y', yScale.bandwidth() / 2)
+      .text(yValue);
 }
