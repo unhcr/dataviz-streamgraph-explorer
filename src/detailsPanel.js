@@ -1,6 +1,6 @@
 import { format } from 'd3-format';
 import { select } from 'd3-selection';
-import { extent, descending } from 'd3-array';
+import { descending, sum } from 'd3-array';
 import detailsBarChart from './detailsBarChart';
 
 const commaFormat = format(',');
@@ -43,7 +43,7 @@ export default function (selection, year, srcData, destData) {
 
   let label;
   let value;
-  let data;
+  let data = [];
 
   // Handle each of these cases:
   // - no data (zero)
@@ -54,8 +54,9 @@ export default function (selection, year, srcData, destData) {
   if (zeroSrc || zeroDest) {
     label = '';
     value = '';
-    data = [];
   } else if (multipleSrc && multipleDest) {
+    label = `Total from origins to destinations`;
+    value = commaFormat(sum(yearSrcData, d => d.value));
   } else if (singleSrc && multipleDest) {
     label = `Total from ${src.name}`;
     value = commaFormat(src.value);
