@@ -17,7 +17,7 @@ function getYearData(year, data){
 }
 
 // Takes the first 20 elements of the data array.
-const top20 = data => data.slice(20);
+const top20 = data => data.slice(0, 20);
 
 // This is the top-level component that manages the
 // elements within the details view.
@@ -33,6 +33,13 @@ export default function (selection, year, srcData, destData) {
   const singleSrc = !multipleSrc;
   const singleDest = !multipleDest;
 
+  const dest = yearDestData[0];
+  const src = yearDestData[0];
+
+  let label = '';
+  let value = NaN;
+  let data = [];
+
   // Handle each of these cases:
   // - multiple src, multiple dest
   // - single src, multiple dest
@@ -40,18 +47,17 @@ export default function (selection, year, srcData, destData) {
   // - single src, single dest
   if (multipleSrc && multipleDest) {
   } else if (singleSrc && multipleDest) {
+    label = `Total from ${src.name}`;
+    value = src.value;
+    data = yearDestData;
   } else if (multipleSrc && singleDest) {
-    const dest = yearDestData[0];
-
-    select('#details-statistic-label')
-      .text(`Total in ${dest.name}`);
-
-    select('#details-statistic-value')
-      .text(commaFormat(dest.value));
-
-    selection
-      .call(detailsBarChart, top20(yearSrcData));
-
+    label = `Total to ${dest.name}`;
+    value = dest.value;
+    data = yearSrcData;
   } else if (singleSrc && singleDest) {
   }
+
+  select('#details-statistic-label').text(label);
+  select('#details-statistic-value').text(commaFormat(value));
+  selection.call(detailsBarChart, top20(data));
 };
