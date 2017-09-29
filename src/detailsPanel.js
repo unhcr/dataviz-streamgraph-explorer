@@ -3,6 +3,13 @@ import { select } from 'd3-selection';
 import { descending, sum } from 'd3-array';
 import detailsBarChart from './detailsBarChart';
 
+// The top n countries are shown.
+const n = 20;
+
+// Takes the first n elements of the data array.
+const topN = data => data.slice(0, n);
+
+// Formats a number with commas, e.g. 1,000,000
 const commaFormat = format(',');
 
 // Extracts the data for the given year,
@@ -18,9 +25,6 @@ function getYearData(year, data){
   }
   return [];
 }
-
-// Takes the first 20 elements of the data array.
-const top20 = data => data.slice(0, 20);
 
 // This is the top-level component that manages the
 // elements within the details view.
@@ -44,6 +48,7 @@ export default function (selection, year, srcData, destData) {
   let label;
   let value;
   let data = [];
+  let barsLabel = `Top ${n} origin countries`;
 
   // Handle each of these cases:
   // - no data (zero)
@@ -57,10 +62,12 @@ export default function (selection, year, srcData, destData) {
   } else if (multipleSrc && multipleDest) {
     label = `Total from origins to destinations`;
     value = commaFormat(sum(yearSrcData, d => d.value));
+    data = yearSrcData;
   } else if (singleSrc && multipleDest) {
     label = `Total from ${src.name}`;
     value = commaFormat(src.value);
     data = yearDestData;
+    barsLabel = `Top ${n} destination countries`;
   } else if (multipleSrc && singleDest) {
     label = `Total to ${dest.name}`;
     value = commaFormat(dest.value);
@@ -72,5 +79,6 @@ export default function (selection, year, srcData, destData) {
 
   select('#details-statistic-label').text(label);
   select('#details-statistic-value').text(value);
-  selection.call(detailsBarChart, top20(data));
+  select('#details-bars-label').text(barsLabel);
+  selection.call(detailsBarChart, topN(data));
 };
