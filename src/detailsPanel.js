@@ -75,6 +75,7 @@ export default function (selection, year, srcData, destData) {
   } else if (singleSrc && singleDest) {
     label = `Total from ${src.name} to ${dest.name}`;
     value = commaFormat(dest.value); // Same as src.value
+    barsLabel = '';
   }
 
   select('#details-statistic-label').text(label);
