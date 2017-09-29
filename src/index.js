@@ -1,7 +1,6 @@
 import ReactiveModel from 'reactive-model';
+import { extent } from 'd3-array';
 import { select } from 'd3-selection';
-import { format } from 'd3-format';
-import { extent, descending } from 'd3-array';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
@@ -13,7 +12,7 @@ import reduceData from './reduceData';
 import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
-import detailsBarChart from './detailsBarChart';
+import detailsPanel from './detailsPanel';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -148,34 +147,8 @@ dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
-
-const commaFormat = format(',');
-dataFlow((year, srcData, destData) => {
-  // Compute the filtered data for the selected year.
-  const yearSrcData = srcData[year];
-
-  // Transform the data for use in a bar chart.
-  const srcBarsData = Object.keys(yearSrcData)
-    .map(key => ({
-      name: key,
-      value: yearSrcData[key]
-    }))
-    .sort((a, b) => descending(a.value, b.value));
-
-  // Update the text of the details panel statistic.
-  const yearDestData = destData[year];
-  const destName = Object.keys(yearDestData)[0];
-  const statisticLabel = `Total in ${destName}`;
-  const statisticValue = Object.values(yearDestData)[0];
-
-  select('#details-statistic-label')
-      .text(statisticLabel);
-
-  select('#details-statistic-value')
-      .text(commaFormat(statisticValue));
-
-  // Render the details bar chart for the selected year.
-  detailsSVG.call(detailsBarChart, srcBarsData);
+dataFlow('detailsPanel', (year, srcData, destData) => {
+  detailsSVG.call(detailsPanel, year, srcData, destData);
 }, 'year, srcData, destData')
 
 // Compute the time extent from the source data,
