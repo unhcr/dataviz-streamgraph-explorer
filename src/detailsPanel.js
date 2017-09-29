@@ -16,6 +16,9 @@ function getYearData(year, data){
     .sort((a, b) => descending(a.value, b.value));
 }
 
+// Takes the first 20 elements of the data array.
+const top20 = data => data.slice(20);
+
 // This is the top-level component that manages the
 // elements within the details view.
 export default function (selection, year, srcData, destData) {
@@ -39,9 +42,16 @@ export default function (selection, year, srcData, destData) {
   } else if (singleSrc && multipleDest) {
   } else if (multipleSrc && singleDest) {
     const dest = yearDestData[0];
-    select('#details-statistic-label').text(`Total in ${dest.name}`);
-    select('#details-statistic-value').text(commaFormat(dest.value));
-    selection.call(detailsBarChart, yearSrcData);
+
+    select('#details-statistic-label')
+      .text(`Total in ${dest.name}`);
+
+    select('#details-statistic-value')
+      .text(commaFormat(dest.value));
+
+    selection
+      .call(detailsBarChart, top20(yearSrcData));
+
   } else if (singleSrc && singleDest) {
   }
 };
