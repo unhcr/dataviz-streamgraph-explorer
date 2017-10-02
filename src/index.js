@@ -1,6 +1,7 @@
 import ReactiveModel from 'reactive-model';
 import { extent } from 'd3-array';
 import { select } from 'd3-selection';
+import { scaleTime } from 'd3-scale';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
@@ -13,6 +14,7 @@ import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
 import detailsPanel from './detailsPanel';
+import setIfChanged from './setIfChanged';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -22,18 +24,13 @@ const focusSelectedYearLayer = focusSVG.append('g');
 
 const detailsSVG = select('#details').append('svg');
 
-// Set background color to be pink so we can see the SVGs (temporary).
-//focusSVG.style('background-color', 'pink');
-//detailsSVG.style('background-color', 'pink');
-
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
 
-// The margin defining spacing around the inner visualization rectangle
-// for the focus SVG (srcStream, destStream, timePanel).
-dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
+// The currently selected year.
+dataFlow('year', 2016);
 
-// TODO derive this from the data.
+// The list of all population types available for filtering.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
   'Returnees',
@@ -43,6 +40,15 @@ dataFlow('availableTypes', [
   'Asylum-seekers',
   'Stateless'
 ]);
+
+// Note that 'years' and 'availableTypes' are hard-coded,
+// and not derived from the data. This is intentional, as the
+// years and types present in the data may vary,
+// depending on the query parameters.
+
+// The margin defining spacing around the inner visualization rectangle
+// for the focus SVG (srcStream, destStream, timePanel).
+dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
 
 // This property is set on page load, and when the URL changes.
 dataFlow('urlIn', location.hash);
@@ -73,10 +79,6 @@ dataFlow('types', paramsIn => {
 // These change when clicking on areas in the StreamGraphs.
 dataFlow('src', d => d.src, 'paramsIn');
 dataFlow('dest', d => d.dest, 'paramsIn');
-
-// The currently selected year.
-// TODO derive initial values from data max.
-dataFlow('year', 2016);
 
 // Render the selected year in the details panel.
 dataFlow(year => {
@@ -161,62 +163,57 @@ dataFlow('timeExtent', srcData => {
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
 
+// The X scale that is common to all components in the focus panel.
+dataFlow('focusXScale', (() => {
+  const xScale = scaleTime();
+  return (timeExtent, box, margin) => {
+    const innerWidth = box.width - margin.right - margin.left;
+    return xScale
+      .domain(timeExtent)
+      .range([margin.left, innerWidth]);
+  };
+})(), 'timeExtent, focusBox, focusMargin');
+
+
 // Render the source and destination StreamGraphs.
-dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(StreamGraph, [
     {
       margin,
-      timeExtent,
+      xScale,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src,
-      // TODO remove duplicated logic here
-      onYearSelect: year => {
-        if(dataFlow.year() !== year) {
-          dataFlow.year(year);
-        }
-      }
+      onYearSelect: setIfChanged(dataFlow.year)
     },
     {
       margin,
-      timeExtent,
+      xScale,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest,
-      // TODO remove duplicated logic here
-      onYearSelect: year => {
-        if(dataFlow.year() !== year) {
-          dataFlow.year(year);
-        }
-      }
+      onYearSelect: setIfChanged(dataFlow.year)
     }
   ]);
-}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, focusMargin, focusXScale');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin) => {
+dataFlow((box, xScale) => {
   focusTimePanelLayer.call(timePanel, {
-    timeExtent,
     box,
-    margin,
-    // TODO remove duplicated logic here
-    onYearSelect: year => {
-      if(dataFlow.year() !== year) {
-        dataFlow.year(year);
-      }
-    }
+    xScale,
+    onYearSelect: setIfChanged(dataFlow.year)
   });
-}, 'timeExtent, focusBox, focusMargin');
+}, 'focusBox, focusXScale');
 
 // Render the selected year line.
-dataFlow((timeExtent, box, margin, year) => {
+dataFlow((box, year, xScale) => {
   focusSelectedYearLayer.call(selectedYearLine, {
-    timeExtent,
     box,
-    margin,
-    year
+    year,
+    xScale
   });
-}, 'timeExtent, focusBox, focusMargin, year');
+}, 'focusBox, year, focusXScale');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
