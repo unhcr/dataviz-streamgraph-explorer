@@ -3,11 +3,12 @@ import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 
 import { scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
-import { local, mouse } from 'd3-selection';
+import { local } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
+import debounce from 'lodash.debounce';
 import dateFromYear from './dateFromYear';
 import backgroundRect from './backgroundRect';
-import debounce from 'lodash.debounce';
+import invokeWithYear from './invokeWithYear';
 
 // The d3.stack layout for computing StreamGraph area shapes.
 const streamStack = stack()
@@ -113,13 +114,8 @@ const StreamGraph = component('g')
       onClick: () => onStreamClick(null),
 
       // Pass selected year to the caller on hover.
-      onMove: () => {
-        // TODO reduce duplicated logic between here and timePanel
-        const xPixel = mouse(selection.node())[0];
-        const hoveredDate = xScale.invert(xPixel);
-        const selectedYear = hoveredDate.getFullYear();
-        onYearSelect(selectedYear);
-      }
+      onMove: invokeWithYear(onYearSelect, selection, xScale)
+
     });
 
     // Compute the dimensions of the inner rectangle.

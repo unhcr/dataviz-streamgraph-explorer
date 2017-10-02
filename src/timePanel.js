@@ -1,7 +1,7 @@
 import { component } from 'd3-component';
 import { axisBottom } from 'd3-axis';
-import { mouse } from 'd3-selection';
 import backgroundRect from './backgroundRect';
+import invokeWithYear from './invokeWithYear';
 
 const xValue = d => d.date;
 const xAxis = axisBottom()
@@ -46,13 +46,7 @@ const timePanel = component('g')
     selection.call(backgroundRect, {
       width: box.width,
       height: box.height,
-      onMove: () => {
-        // TODO reduce duplicated logic between here and streamGraph
-        const xPixel = mouse(selection.node())[0];
-        const hoveredDate = xScale.invert(xPixel);
-        const selectedYear = hoveredDate.getFullYear();
-        onYearSelect(selectedYear);
-      }
+      onMove: invokeWithYear(onYearSelect, selection, xScale)
     });
   });
 
