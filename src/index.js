@@ -27,11 +27,10 @@ const detailsSVG = select('#details').append('svg');
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
 
-// The margin defining spacing around the inner visualization rectangle
-// for the focus SVG (srcStream, destStream, timePanel).
-dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
+// The currently selected year.
+dataFlow('year', 2016);
 
-// TODO derive this from the data.
+// The list of all population types available for filtering.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
   'Returnees',
@@ -41,6 +40,15 @@ dataFlow('availableTypes', [
   'Asylum-seekers',
   'Stateless'
 ]);
+
+// Note that 'years' and 'availableTypes' are hard-coded,
+// and not derived from the data. This is intentional, as the
+// years and types present in the data may vary,
+// depending on the query parameters.
+
+// The margin defining spacing around the inner visualization rectangle
+// for the focus SVG (srcStream, destStream, timePanel).
+dataFlow('focusMargin', { top: 0, bottom: 0, left: 0, right: 15 });
 
 // This property is set on page load, and when the URL changes.
 dataFlow('urlIn', location.hash);
@@ -71,10 +79,6 @@ dataFlow('types', paramsIn => {
 // These change when clicking on areas in the StreamGraphs.
 dataFlow('src', d => d.src, 'paramsIn');
 dataFlow('dest', d => d.dest, 'paramsIn');
-
-// The currently selected year.
-// TODO derive initial values from data max.
-dataFlow('year', 2016);
 
 // Render the selected year in the details panel.
 dataFlow(year => {
