@@ -13,6 +13,7 @@ import { parseParams, encodeParams } from './router';
 import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
 import detailsPanel from './detailsPanel';
+import setIfChanged from './setIfChanged';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -21,10 +22,6 @@ const focusStreamGraphLayer = focusSVG.append('g');
 const focusSelectedYearLayer = focusSVG.append('g');
 
 const detailsSVG = select('#details').append('svg');
-
-// Set background color to be pink so we can see the SVGs (temporary).
-//focusSVG.style('background-color', 'pink');
-//detailsSVG.style('background-color', 'pink');
 
 // The reactive data flow graph for the application.
 const dataFlow = ReactiveModel();
@@ -170,12 +167,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src,
-      // TODO remove duplicated logic here
-      onYearSelect: year => {
-        if(dataFlow.year() !== year) {
-          dataFlow.year(year);
-        }
-      }
+      onYearSelect: setIfChanged(dataFlow.year)
     },
     {
       margin,
@@ -183,12 +175,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest,
-      // TODO remove duplicated logic here
-      onYearSelect: year => {
-        if(dataFlow.year() !== year) {
-          dataFlow.year(year);
-        }
-      }
+      onYearSelect: setIfChanged(dataFlow.year)
     }
   ]);
 }, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
@@ -199,12 +186,7 @@ dataFlow((timeExtent, box, margin) => {
     timeExtent,
     box,
     margin,
-    // TODO remove duplicated logic here
-    onYearSelect: year => {
-      if(dataFlow.year() !== year) {
-        dataFlow.year(year);
-      }
-    }
+    onYearSelect: setIfChanged(dataFlow.year)
   });
 }, 'timeExtent, focusBox, focusMargin');
 
