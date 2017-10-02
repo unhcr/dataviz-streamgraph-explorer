@@ -1,6 +1,7 @@
 import ReactiveModel from 'reactive-model';
 import { extent } from 'd3-array';
 import { select } from 'd3-selection';
+import { scaleTime } from 'd3-scale';
 import resize from './resize';
 import computeLayout from './computeLayout';
 import detectMobile from './detectMobile';
@@ -158,12 +159,24 @@ dataFlow('timeExtent', srcData => {
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
 
+// The X scale that is common to all components in the focus panel.
+dataFlow('focusXScale', (() => {
+  const xScale = scaleTime();
+  return (timeExtent, box, margin) => {
+    const innerWidth = box.width - margin.right - margin.left;
+    return xScale
+      .domain(timeExtent)
+      .range([margin.left, innerWidth]);
+  };
+})(), 'timeExtent, focusBox, focusMargin');
+
+
 // Render the source and destination StreamGraphs.
-dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, margin) => {
+dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(StreamGraph, [
     {
       margin,
-      timeExtent,
+      xScale,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src,
@@ -171,34 +184,32 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExte
     },
     {
       margin,
-      timeExtent,
+      xScale,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest,
       onYearSelect: setIfChanged(dataFlow.year)
     }
   ]);
-}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, timeExtent, focusMargin');
+}, 'srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, focusMargin, focusXScale');
 
 // Render the time panel that shows the years between the StreamGraphs.
-dataFlow((timeExtent, box, margin) => {
+dataFlow((box, xScale) => {
   focusTimePanelLayer.call(timePanel, {
-    timeExtent,
     box,
-    margin,
+    xScale,
     onYearSelect: setIfChanged(dataFlow.year)
   });
-}, 'timeExtent, focusBox, focusMargin');
+}, 'focusBox, focusXScale');
 
 // Render the selected year line.
-dataFlow((timeExtent, box, margin, year) => {
+dataFlow((box, year, xScale) => {
   focusSelectedYearLayer.call(selectedYearLine, {
-    timeExtent,
     box,
-    margin,
-    year
+    year,
+    xScale
   });
-}, 'timeExtent, focusBox, focusMargin, year');
+}, 'focusBox, year, focusXScale');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
