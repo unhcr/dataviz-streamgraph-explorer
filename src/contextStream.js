@@ -30,9 +30,15 @@ const contextAreaComponent = component('path')
 
 const contextBrushComponent = component('g')
   .render((selection, props) => {
-    contextBrush.on('brush', () => {
-      props.onBrush(event.selection.map(xScale.invert));
-    });
+    contextBrush
+      .on('brush', () => {
+        props.onBrush(event.selection.map(xScale.invert));
+      })
+      .on('end', () => {
+        if (!event.selection) {
+          props.onBrush(null);
+        }
+      });
     selection
       .attr('transform', `translate(${props.box.x},${props.box.y})`)
       .call(contextBrush);

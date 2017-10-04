@@ -32,6 +32,12 @@ const dataFlow = ReactiveModel();
 // The currently selected year.
 dataFlow('year', 2016);
 
+// The full time extent.
+dataFlow('timeExtent', [1951, 2016].map(dateFromYear));
+
+// The current zoomed time extent.
+dataFlow('zoom', null);
+
 // The list of all population types available for filtering.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
@@ -43,7 +49,7 @@ dataFlow('availableTypes', [
   'Stateless'
 ]);
 
-// Note that 'years' and 'availableTypes' are hard-coded,
+// Note that 'year', 'timeExtent', and 'availableTypes' are hard-coded,
 // and not derived from the data. This is intentional, as the
 // years and types present in the data may vary,
 // depending on the query parameters.
@@ -165,12 +171,6 @@ dataFlow('detailsPanel', (year, srcData, destData) => {
   detailsSVG.call(detailsPanel, year, srcData, destData);
 }, 'year, srcData, destData')
 
-// Compute the time extent from the source data,
-// which should always match with the extent of the dest data.
-dataFlow('timeExtent', srcData => {
-  return extent(Object.keys(srcData).map(dateFromYear));
-}, 'srcData');
-
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
@@ -178,13 +178,13 @@ dataFlow('destDataReduced', reduceData, 'destData');
 // The X scale that is common to all components in the focus panel.
 dataFlow('focusXScale', (() => {
   const xScale = scaleTime();
-  return (timeExtent, box, margin) => {
+  return (timeExtent, zoom, box, margin) => {
     const innerWidth = box.width - margin.right - margin.left;
     return xScale
-      .domain(timeExtent)
+      .domain(zoom ? zoom : timeExtent)
       .range([margin.left, innerWidth]);
   };
-})(), 'timeExtent, focusBox, focusMargin');
+})(), 'timeExtent, zoom, focusBox, focusMargin');
 
 
 // Render the source and destination StreamGraphs.
@@ -232,7 +232,7 @@ dataFlow((box, srcData) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
     data: contextStreamData(srcData),
-    onBrush: dataFlow.timeExtent
+    onBrush: dataFlow.zoom
   });
 }, 'contextStreamBox, srcData');
 
