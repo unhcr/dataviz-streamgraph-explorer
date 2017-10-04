@@ -3,6 +3,7 @@ import { area, curveBasis } from 'd3-shape';
 import { component } from 'd3-component';
 import { max, extent } from 'd3-array';
 import { brushX } from 'd3-brush';
+import { event } from 'd3-selection';
 
 const xValue = d => d.date;
 const xScale = scaleTime();
@@ -21,30 +22,29 @@ const contextBrush = brushX();
 const contextAreaComponent = component('path')
   .render((selection, props) => {
     const box = props.box;
-    const data = props.data;
-    const onBrush = props.onBrush;
-    xScale
-      .domain(extent(data, xValue))
-      .range([0, box.width]);
-    yScale
-      .domain([0, max(data, yValue)])
-      .range([0, box.height / 2]);
     selection
       .attr('transform', `translate(${box.x},${box.y + box.height / 2})`)
-      .attr('d', contextArea(data))
+      .attr('d', contextArea(props.data))
       .attr('fill', 'gray');
   });
 
 const contextBrushComponent = component('g')
   .render((selection, props) => {
-    const box = props.box;
-    contextBrush.on('brush', () => console.log('brushed'));
+    contextBrush.on('brush', () => {
+      props.onBrush(event.selection.map(xScale.invert));
+    });
     selection
-      .attr('transform', `translate(${box.x},${box.y})`)
+      .attr('transform', `translate(${props.box.x},${props.box.y})`)
       .call(contextBrush);
   });
 
 const contextStream = (selection, props) => {
+  xScale
+    .domain(extent(props.data, xValue))
+    .range([0, props.box.width]);
+  yScale
+    .domain([0, max(props.data, yValue)])
+    .range([0, props.box.height / 2]);
   selection
     .call(contextAreaComponent, props)
     .call(contextBrushComponent, props);
