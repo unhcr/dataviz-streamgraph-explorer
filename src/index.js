@@ -232,7 +232,7 @@ dataFlow((box, srcData) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
     data: contextStreamData(srcData),
-    onBrush: (extent) => console.log(extent)
+    onBrush: dataFlow.timeExtent
   });
 }, 'contextStreamBox, srcData');
 
