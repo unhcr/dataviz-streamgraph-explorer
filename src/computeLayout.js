@@ -34,7 +34,7 @@ export default function layout(mobile, windowBox) {
     ]
   }, {
     timePanel: { size: 0.1 },
-    contextStream: { size: 0.1 }
+    contextStream: { size: 0.2 }
   }, focusBox);
 
   return {

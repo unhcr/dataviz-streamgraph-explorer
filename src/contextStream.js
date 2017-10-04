@@ -1,5 +1,5 @@
 import { scaleLinear, scaleTime } from 'd3-scale';
-import { area } from 'd3-shape';
+import { area, curveBasis } from 'd3-shape';
 import { component } from 'd3-component';
 import { max, extent } from 'd3-array';
 
@@ -11,8 +11,9 @@ const yScale = scaleLinear();
 
 const contextArea = area()
   .x(d => xScale(xValue(d)))
-  .y0(0)
-  .y1(d => yScale(yValue(d)));
+  .y0(d => -yScale(yValue(d)))
+  .y1(d => yScale(yValue(d)))
+  .curve(curveBasis);
 
 const contextAreaComponent = component('path')
   .render((selection, props) => {
@@ -23,9 +24,9 @@ const contextAreaComponent = component('path')
       .range([0, box.width]);
     yScale
       .domain([0, max(data, yValue)])
-      .range([0, box.height]);
+      .range([0, box.height / 2]);
     selection
-      .attr('transform', `translate(${box.x},${box.y})`)
+      .attr('transform', `translate(${box.x},${box.y + box.height / 2})`)
       .attr('d', contextArea(data))
       .attr('fill', 'gray');
   });
