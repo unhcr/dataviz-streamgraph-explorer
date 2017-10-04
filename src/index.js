@@ -15,6 +15,7 @@ import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
 import detailsPanel from './detailsPanel';
 import setIfChanged from './setIfChanged';
+import contextStream from './contextStream';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -121,6 +122,7 @@ dataFlow('focusArrangement', layout => layout.focusArrangement, 'layout');
 dataFlow('srcStreamBox', d => d.srcStream, 'focusArrangement');
 dataFlow('destStreamBox', d => d.destStream, 'focusArrangement');
 dataFlow('timePanelBox', d => d.timePanel, 'focusArrangement');
+dataFlow('contextStreamBox', d => d.contextStream, 'focusArrangement');
 
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
@@ -214,6 +216,11 @@ dataFlow((box, year, xScale) => {
     xScale
   });
 }, 'focusBox, year, focusXScale');
+
+// Render the context stream.
+dataFlow((box) => {
+  focusStreamGraphLayer.call(contextStream, { box });
+}, 'contextStreamBox');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
