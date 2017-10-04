@@ -152,7 +152,8 @@ const StreamGraph = component('g')
             // pass null to the click callback to signal de-selection.
             onStreamClick(null);
           }
-        });
+        })
+        .on('mousemove', invokeWithYear(onYearSelect, selection, xScale));
     paths.exit().remove();
 
     // Render the labels.
