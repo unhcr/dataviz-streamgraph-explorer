@@ -29,12 +29,12 @@ export default function layout(mobile, windowBox) {
     children: [
       'srcStream',
       'timePanel',
-      'destStream'
+      'destStream',
+      'contextStream'
     ]
   }, {
-    timePanel: {
-      size: 0.1
-    }
+    timePanel: { size: 0.1 },
+    contextStream: { size: 0.2 }
   }, focusBox);
 
   return {

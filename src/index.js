@@ -15,6 +15,8 @@ import dateFromYear from './dateFromYear';
 import selectedYearLine from './selectedYearLine';
 import detailsPanel from './detailsPanel';
 import setIfChanged from './setIfChanged';
+import contextStream from './contextStream';
+import contextStreamData from './contextStreamData';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -30,6 +32,12 @@ const dataFlow = ReactiveModel();
 // The currently selected year.
 dataFlow('year', 2016);
 
+// The full time extent.
+dataFlow('timeExtent', [1951, 2016].map(dateFromYear));
+
+// The current zoomed time extent.
+dataFlow('zoom', null);
+
 // The list of all population types available for filtering.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
@@ -41,7 +49,7 @@ dataFlow('availableTypes', [
   'Stateless'
 ]);
 
-// Note that 'years' and 'availableTypes' are hard-coded,
+// Note that 'year', 'timeExtent', and 'availableTypes' are hard-coded,
 // and not derived from the data. This is intentional, as the
 // years and types present in the data may vary,
 // depending on the query parameters.
@@ -120,7 +128,17 @@ dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
 dataFlow('focusArrangement', layout => layout.focusArrangement, 'layout');
 dataFlow('srcStreamBox', d => d.srcStream, 'focusArrangement');
 dataFlow('destStreamBox', d => d.destStream, 'focusArrangement');
-dataFlow('timePanelBox', d => d.timePanel, 'focusArrangement');
+dataFlow('contextStreamBox', d => d.contextStream, 'focusArrangement');
+
+// The time panel box should include the srcStream and descStream boxes.
+dataFlow('timePanelBox', d => {
+  return {
+    x: 0,
+    y: 0,
+    width: d.srcStream.width,
+    height: d.destStream.y + d.destStream.height
+  };
+}, 'focusArrangement');
 
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
@@ -153,12 +171,6 @@ dataFlow('detailsPanel', (year, srcData, destData) => {
   detailsSVG.call(detailsPanel, year, srcData, destData);
 }, 'year, srcData, destData')
 
-// Compute the time extent from the source data,
-// which should always match with the extent of the dest data.
-dataFlow('timeExtent', srcData => {
-  return extent(Object.keys(srcData).map(dateFromYear));
-}, 'srcData');
-
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
 dataFlow('destDataReduced', reduceData, 'destData');
@@ -166,13 +178,13 @@ dataFlow('destDataReduced', reduceData, 'destData');
 // The X scale that is common to all components in the focus panel.
 dataFlow('focusXScale', (() => {
   const xScale = scaleTime();
-  return (timeExtent, box, margin) => {
+  return (timeExtent, zoom, box, margin) => {
     const innerWidth = box.width - margin.right - margin.left;
     return xScale
-      .domain(timeExtent)
+      .domain(zoom ? zoom : timeExtent)
       .range([margin.left, innerWidth]);
   };
-})(), 'timeExtent, focusBox, focusMargin');
+})(), 'timeExtent, zoom, focusBox, focusMargin');
 
 
 // Render the source and destination StreamGraphs.
@@ -204,7 +216,7 @@ dataFlow((box, xScale) => {
     xScale,
     onYearSelect: setIfChanged(dataFlow.year)
   });
-}, 'focusBox, focusXScale');
+}, 'timePanelBox, focusXScale');
 
 // Render the selected year line.
 dataFlow((box, year, xScale) => {
@@ -214,6 +226,15 @@ dataFlow((box, year, xScale) => {
     xScale
   });
 }, 'focusBox, year, focusXScale');
+
+// Render the context stream.
+dataFlow((box, srcData) => {
+  focusStreamGraphLayer.call(contextStream, {
+    box,
+    data: contextStreamData(srcData),
+    onBrush: dataFlow.zoom
+  });
+}, 'contextStreamBox, srcData');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {

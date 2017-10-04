@@ -8,6 +8,7 @@
     "d3-array": "^1.2.0",
     "d3-axis": "^1.0.8",
     "d3-boxes": "0.0.2",
+    "d3-brush": "^1.0.4",
     "d3-collection": "^1.0.4",
     "d3-component": "^3.0.0",
     "d3-format": "^1.2.0",
