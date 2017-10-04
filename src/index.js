@@ -1,5 +1,5 @@
 import ReactiveModel from 'reactive-model';
-import { extent, sum } from 'd3-array';
+import { extent } from 'd3-array';
 import { select } from 'd3-selection';
 import { scaleTime } from 'd3-scale';
 import resize from './resize';
@@ -16,6 +16,7 @@ import selectedYearLine from './selectedYearLine';
 import detailsPanel from './detailsPanel';
 import setIfChanged from './setIfChanged';
 import contextStream from './contextStream';
+import contextStreamData from './contextStreamData';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -217,25 +218,13 @@ dataFlow((box, year, xScale) => {
   });
 }, 'focusBox, year, focusXScale');
 
-// Compote the context stream data,
-// as the sum total of all countries across all years.
-dataFlow('contextStreamData', srcData => {
-  return Object.keys(srcData).map(year => {
-    return {
-      year,
-      total: sum(Object.values(srcData[year]))
-    };
-  });
-}, 'srcData');
-
 // Render the context stream.
-dataFlow((box, data) => {
-  console.log(data);
+dataFlow((box, srcData) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
-    data
+    data: contextStreamData(srcData)
   });
-}, 'contextStreamBox, contextStreamData');
+}, 'contextStreamBox, srcData');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {

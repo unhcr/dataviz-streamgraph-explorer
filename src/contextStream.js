@@ -1,4 +1,5 @@
 const contextStream = (selection, props) => {
+  console.log(props.data);
   selection.append('rect')
     .attr('x', props.box.x)
     .attr('y', props.box.y)
