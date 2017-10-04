@@ -122,8 +122,17 @@ dataFlow('detailsBox', layout => layout.detailsBox, 'layout');
 dataFlow('focusArrangement', layout => layout.focusArrangement, 'layout');
 dataFlow('srcStreamBox', d => d.srcStream, 'focusArrangement');
 dataFlow('destStreamBox', d => d.destStream, 'focusArrangement');
-dataFlow('timePanelBox', d => d.timePanel, 'focusArrangement');
 dataFlow('contextStreamBox', d => d.contextStream, 'focusArrangement');
+
+// The time panel box should include the srcStream and descStream boxes.
+dataFlow('timePanelBox', d => {
+  return {
+    x: 0,
+    y: 0,
+    width: d.srcStream.width,
+    height: d.destStream.y + d.destStream.height
+  };
+}, 'focusArrangement');
 
 // Resize the SVG elements based on the computed layout.
 dataFlow('focusSVGSize', focusBox => {
@@ -207,7 +216,7 @@ dataFlow((box, xScale) => {
     xScale,
     onYearSelect: setIfChanged(dataFlow.year)
   });
-}, 'focusBox, focusXScale');
+}, 'timePanelBox, focusXScale');
 
 // Render the selected year line.
 dataFlow((box, year, xScale) => {
