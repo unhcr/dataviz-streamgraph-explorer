@@ -2,6 +2,7 @@ import { scaleLinear, scaleTime } from 'd3-scale';
 import { area, curveBasis } from 'd3-shape';
 import { component } from 'd3-component';
 import { max, extent } from 'd3-array';
+import { brushX } from 'd3-brush';
 
 const xValue = d => d.date;
 const xScale = scaleTime();
@@ -15,10 +16,13 @@ const contextArea = area()
   .y1(d => yScale(yValue(d)))
   .curve(curveBasis);
 
+const contextBrush = brushX();
+
 const contextAreaComponent = component('path')
   .render((selection, props) => {
     const box = props.box;
     const data = props.data;
+    const onBrush = props.onBrush;
     xScale
       .domain(extent(data, xValue))
       .range([0, box.width]);
@@ -31,7 +35,18 @@ const contextAreaComponent = component('path')
       .attr('fill', 'gray');
   });
 
+const contextBrushComponent = component('g')
+  .render((selection, props) => {
+    const box = props.box;
+    contextBrush.on('brush', () => console.log('brushed'));
+    selection
+      .attr('transform', `translate(${box.x},${box.y})`)
+      .call(contextBrush);
+  });
+
 const contextStream = (selection, props) => {
-  selection.call(contextAreaComponent, props);
+  selection
+    .call(contextAreaComponent, props)
+    .call(contextBrushComponent, props);
 };
 export default contextStream;

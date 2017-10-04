@@ -231,7 +231,8 @@ dataFlow((box, year, xScale) => {
 dataFlow((box, srcData) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
-    data: contextStreamData(srcData)
+    data: contextStreamData(srcData),
+    onBrush: (extent) => console.log(extent)
   });
 }, 'contextStreamBox, srcData');
 
