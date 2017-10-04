@@ -1,13 +1,14 @@
 import { component } from 'd3-component';
 import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 'd3-shape';
-import { scaleTime, scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
+import { scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
-import { local, mouse } from 'd3-selection';
+import { local } from 'd3-selection';
 import { areaLabel } from 'd3-area-label';
+import debounce from 'lodash.debounce';
 import dateFromYear from './dateFromYear';
 import backgroundRect from './backgroundRect';
-import debounce from 'lodash.debounce';
+import invokeWithYear from './invokeWithYear';
 
 // The d3.stack layout for computing StreamGraph area shapes.
 const streamStack = stack()
@@ -44,7 +45,6 @@ const forStacking = data => Object.keys(data)
 const xValue = d => d.date;
 
 // Create the x, y, and color scales.
-const xScale = scaleTime();
 const colorScale = scaleOrdinal().range(schemeCategory10);
 
 // The d3 local that stores things local to each StreamGraph instance.
@@ -52,14 +52,14 @@ const streamLocal = local();
 
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
-  .create((selection, d) => {
+  .create((selection, props) => {
 
     // Each StreamGraph instance has its own Y scale.
     const yScale = scaleLinear();
 
     // The d3.area path generator for StreamGraph areas.
     const streamArea = area()
-      .x(d => xScale(xValue(d.data)))
+      .x(d => props.xScale(xValue(d.data)))
       .y0(d => yScale(d[0]))
       .y1(d => yScale(d[1]))
       .curve(curveBasis);
@@ -84,9 +84,9 @@ const StreamGraph = component('g')
     const data = props.data;
     const box = props.box;
     const onStreamClick = props.onStreamClick;
-    const timeExtent = props.timeExtent;
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
+    const xScale = props.xScale;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -114,23 +114,14 @@ const StreamGraph = component('g')
       onClick: () => onStreamClick(null),
 
       // Pass selected year to the caller on hover.
-      onMove: () => {
-        // TODO reduce duplicated logic between here and timePanel
-        const xPixel = mouse(selection.node())[0];
-        const hoveredDate = xScale.invert(xPixel);
-        const selectedYear = hoveredDate.getFullYear();
-        onYearSelect(selectedYear);
-      }
+      onMove: invokeWithYear(onYearSelect, selection, xScale)
+
     });
 
     // Compute the dimensions of the inner rectangle.
-    const innerWidth = box.width - margin.right - margin.left;
     const innerHeight = box.height - margin.top - margin.bottom;
 
-    // Set the domain and range of x and y scales.
-    xScale
-      .domain(timeExtent)
-      .range([margin.left, innerWidth]);
+    // Set the domain and range of y scale.
     yScale
       .domain([
         min(stacked, series => min(series, d => d[0])),
@@ -161,7 +152,8 @@ const StreamGraph = component('g')
             // pass null to the click callback to signal de-selection.
             onStreamClick(null);
           }
-        });
+        })
+        .on('mousemove', invokeWithYear(onYearSelect, selection, xScale));
     paths.exit().remove();
 
     // Render the labels.

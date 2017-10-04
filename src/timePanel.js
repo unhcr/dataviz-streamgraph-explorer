@@ -1,13 +1,10 @@
 import { component } from 'd3-component';
-import { scaleTime } from 'd3-scale';
 import { axisBottom } from 'd3-axis';
-import { mouse } from 'd3-selection';
 import backgroundRect from './backgroundRect';
+import invokeWithYear from './invokeWithYear';
 
 const xValue = d => d.date;
-const xScale = scaleTime();
 const xAxis = axisBottom()
-  .scale(xScale)
   .tickPadding(0)
   .tickSize(0);
 
@@ -17,21 +14,11 @@ const timePanel = component('g')
 
     // Unpack the properties passed in.
     const box = props.box;
-    const timeExtent = props.timeExtent;
-    const margin = props.margin;
     const onYearSelect = props.onYearSelect;
-
-    // Compute the dimensions of the inner rectangle.
-    const innerWidth = box.width - margin.right - margin.left;
-    const innerHeight = box.height - margin.top - margin.bottom;
-
-    // Set the X scale domain and range.
-    xScale
-      .domain(timeExtent)
-      .range([margin.left, innerWidth]);
+    const xScale = props.xScale;
 
     // Render the X axis.
-    selection.call(xAxis);
+    selection.call(xAxis.scale(xScale));
 
     // Customize the text appearance.
     selection.selectAll('.tick text')
@@ -59,13 +46,7 @@ const timePanel = component('g')
     selection.call(backgroundRect, {
       width: box.width,
       height: box.height,
-      onMove: () => {
-        // TODO reduce duplicated logic between here and streamGraph
-        const xPixel = mouse(selection.node())[0];
-        const hoveredDate = xScale.invert(xPixel);
-        const selectedYear = hoveredDate.getFullYear();
-        onYearSelect(selectedYear);
-      }
+      onMove: invokeWithYear(onYearSelect, selection, xScale)
     });
   });
 

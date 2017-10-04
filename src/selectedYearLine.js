@@ -1,9 +1,5 @@
 import { component } from 'd3-component';
-import { scaleTime } from 'd3-scale';
 import dateFromYear from './dateFromYear';
-
-// TODO refactor so the xScale is not defined in multiple places.
-const xScale = scaleTime();
 
 // The d3-component for the selected year line.
 const selectedYearLine = component('line')
@@ -20,17 +16,8 @@ const selectedYearLine = component('line')
 
     // Unpack the properties passed in.
     const box = props.box;
-    const timeExtent = props.timeExtent;
-    const margin = props.margin;
     const year = dateFromYear(props.year);
-
-    // Compute the dimensions of the inner rectangle.
-    const innerWidth = box.width - margin.right - margin.left;
-
-    // Set the X scale domain and range.
-    xScale
-      .domain(timeExtent)
-      .range([margin.left, innerWidth]);
+    const xScale = props.xScale;
 
     // Render the selected year line.
     selection
