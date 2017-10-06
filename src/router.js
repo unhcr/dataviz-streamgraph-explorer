@@ -34,11 +34,15 @@ export function parseParams(hash, availableTypes) {
   };
 }
 
+// Encodes the zoomed extent (min and max) to a string.
+const encodeZoom = extent => JSON.stringify(extent);
+
 // Encodes the parameters into the URL hash.
 export function encodeParams(params, availableTypes) {
   return queryString.stringify({
     src: encodePlace(params.src),
     dest: encodePlace(params.dest),
-    types: encodeTypes(params.types, availableTypes)
+    types: encodeTypes(params.types, availableTypes),
+    zoom: encodeZoom(params.zoom)
   });
 }

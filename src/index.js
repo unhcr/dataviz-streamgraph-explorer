@@ -247,9 +247,9 @@ dataFlow('typeSelector', (types, availableTypes) => {
 }, 'types, availableTypes');
 
 // Update the URL when properties change.
-dataFlow('urlOut', (src, dest, types, availableTypes) => {
-  const params = { src, dest, types };
+dataFlow('urlOut', (src, dest, types, availableTypes, zoom) => {
+  const params = { src, dest, types, zoom };
   const urlOut = encodeParams(params, availableTypes);
   location.hash = urlOut;
   return urlOut;
-}, 'src, dest, types, availableTypes');
+}, 'src, dest, types, availableTypes, zoom');
