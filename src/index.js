@@ -35,9 +35,6 @@ dataFlow('year', 2016);
 // The full time extent.
 dataFlow('timeExtent', [1951, 2016].map(dateFromYear));
 
-// The current zoomed time extent.
-dataFlow('zoom', null);
-
 // The list of all population types available for filtering.
 dataFlow('availableTypes', [
   'Refugees (incl. refugee-like situations)',
@@ -82,11 +79,13 @@ dataFlow('types', paramsIn => {
   return paramsIn.types || dataFlow.availableTypes();
 }, 'paramsIn');
 
-// The currently selected source and destination.
+// The currently selected source, destination, and zoom.
 // These are initialized to values from the URL hash.
-// These change when clicking on areas in the StreamGraphs.
+// These change when clicking on areas in the StreamGraphs,
+// or brushing to change zoom.
 dataFlow('src', d => d.src, 'paramsIn');
 dataFlow('dest', d => d.dest, 'paramsIn');
+dataFlow('zoom', d => d.zoom, 'paramsIn');
 
 // Render the selected year in the details panel.
 dataFlow(year => {
@@ -228,13 +227,14 @@ dataFlow((box, year, xScale) => {
 }, 'focusBox, year, focusXScale');
 
 // Render the context stream.
-dataFlow((box, srcData) => {
+dataFlow((box, zoom, srcData) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
+    zoom,
     data: contextStreamData(srcData),
     onBrush: dataFlow.zoom
   });
-}, 'contextStreamBox, srcData');
+}, 'contextStreamBox, zoom, srcData');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
@@ -247,9 +247,9 @@ dataFlow('typeSelector', (types, availableTypes) => {
 }, 'types, availableTypes');
 
 // Update the URL when properties change.
-dataFlow('urlOut', (src, dest, types, availableTypes) => {
-  const params = { src, dest, types };
+dataFlow('urlOut', (src, dest, types, availableTypes, zoom) => {
+  const params = { src, dest, types, zoom };
   const urlOut = encodeParams(params, availableTypes);
   location.hash = urlOut;
   return urlOut;
-}, 'src, dest, types, availableTypes');
+}, 'src, dest, types, availableTypes, zoom');
