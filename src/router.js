@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { timeFormat } from 'd3-time-format';
+import { timeFormat, timeParse } from 'd3-time-format';
 
 // Parses the types from the URL "types" parameter,
 // which is encoded as, for example "1-3-4-5".
@@ -25,25 +25,34 @@ const parsePlace = place => place || null;
 // is omitted from the URL (null causes "src" to show up).
 const encodePlace = place => place || undefined;
 
+// Parses the zoom extent from a string.
+const zoomDelimiter = '_';
+const zoomSpecifier = '%Y-%m';
+const zoomParse = timeParse(zoomSpecifier);
+const parseZoom = zoomStr => zoomStr
+  .split(zoomDelimiter)
+  .map(zoomParse);
+
+// Encodes the zoomed extent (min and max) to a string.
+const zoomFormat = timeFormat('%Y-%m');
+const encodeZoom = zoom => {
+  if (zoom) {
+    return zoom.map(zoomFormat).join(zoomDelimiter);
+  } else {
+    return undefined;
+  }
+};
+
 // Parses the parameters from the URL hash.
 export function parseParams(hash, availableTypes) {
   const params = queryString.parse(hash);
   return {
     src: parsePlace(params.src),
     dest: parsePlace(params.dest),
-    types: params.types ? parseTypes(params.types, availableTypes) : null
+    types: params.types ? parseTypes(params.types, availableTypes) : null,
+    zoom: params.zoom ? parseZoom(params.zoom) : null
   };
 }
-
-// Encodes the zoomed extent (min and max) to a string.
-const zoomFormat = timeFormat('%Y-%m');
-const encodeZoom = extent => {
-  if (extent) {
-    return extent.map(zoomFormat).join('_');
-  } else {
-    return undefined;
-  }
-};
 
 // Encodes the parameters into the URL hash.
 export function encodeParams(params, availableTypes) {
