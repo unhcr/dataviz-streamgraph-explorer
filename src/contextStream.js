@@ -32,7 +32,8 @@ const contextBrushComponent = component('g')
   .render((selection, props) => {
     contextBrush
       .on('brush', () => {
-        props.onBrush(event.selection.map(xScale.invert));
+        const zoom = event.selection;
+        props.onBrush(zoom ? zoom.map(xScale.invert) : null);
       })
       .on('end', () => {
         if (!event.selection) {
@@ -43,7 +44,8 @@ const contextBrushComponent = component('g')
       .attr('transform', `translate(${props.box.x},${props.box.y})`)
       .call(contextBrush);
 
-    contextBrush.move(selection, props.zoom.map(xScale));
+    const zoom = props.zoom;
+    contextBrush.move(selection, zoom ? zoom.map(xScale) : null);
   });
 
 const contextStream = (selection, props) => {
