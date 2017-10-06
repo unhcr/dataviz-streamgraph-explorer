@@ -1,4 +1,5 @@
 import queryString from 'query-string';
+import { timeFormat } from 'd3-time-format';
 
 // Parses the types from the URL "types" parameter,
 // which is encoded as, for example "1-3-4-5".
@@ -35,7 +36,14 @@ export function parseParams(hash, availableTypes) {
 }
 
 // Encodes the zoomed extent (min and max) to a string.
-const encodeZoom = extent => JSON.stringify(extent);
+const zoomFormat = timeFormat('%Y-%m');
+const encodeZoom = extent => {
+  if (extent) {
+    return extent.map(zoomFormat).join('_');
+  } else {
+    return undefined;
+  }
+};
 
 // Encodes the parameters into the URL hash.
 export function encodeParams(params, availableTypes) {
