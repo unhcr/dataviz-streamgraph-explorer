@@ -42,6 +42,8 @@ const contextBrushComponent = component('g')
     selection
       .attr('transform', `translate(${props.box.x},${props.box.y})`)
       .call(contextBrush);
+
+    contextBrush.move(selection, props.zoom.map(xScale));
   });
 
 const contextStream = (selection, props) => {
