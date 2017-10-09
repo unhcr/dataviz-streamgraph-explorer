@@ -27,3 +27,20 @@ http-server
 ```
 
 Now the site should be available at localhost:8080.
+
+## Deployment
+
+We are using GitHub pages to deploy this project to the Web. Deployments are manual, and require the following steps:
+
+```
+git checkout master
+git pull
+git checkout gh-pages
+git merge master
+npm run build
+git status -s # You should see that only build.js has been changed.
+git add .
+git branch # Make sure you're on the gh-pages branch.
+git commit -m "Deploy the latest" -a
+git push
+```
