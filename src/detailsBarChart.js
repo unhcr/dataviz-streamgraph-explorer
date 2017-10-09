@@ -15,7 +15,7 @@ const margin = { left: 160, right: 70, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-export default (selection, data) => {
+export default (selection, { data, maxCountries }) => {
 
   const width = selection.attr('width');
   const height = selection.attr('height');
@@ -25,7 +25,7 @@ export default (selection, data) => {
 
   // Make each bar this many pixels high.
   // Fit 20 bars on screen as the maximum number.
-  const barHeight = innerHeight / 20;
+  const barHeight = innerHeight / maxCountries;
 
   xScale
     .domain([0, max(data, xValue)])
