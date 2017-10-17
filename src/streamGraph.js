@@ -50,6 +50,13 @@ const colorScale = scaleOrdinal().range(schemeCategory10);
 // The d3 local that stores things local to each StreamGraph instance.
 const streamLocal = local();
 
+// The component that will render the label.
+const labelComponent = component('text')
+  .render((selection, props) => {
+    selection
+        .text(props.label)
+  });
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
   .create((selection, props) => {
@@ -156,7 +163,7 @@ const StreamGraph = component('g')
         .on('mousemove', invokeWithYear(onYearSelect, selection, xScale));
     paths.exit().remove();
 
-    // Render the labels.
+    // Render the area labels.
     const labels = selection.selectAll('text').data(stacked);
     labels
       .enter().append('text')
@@ -167,6 +174,9 @@ const StreamGraph = component('g')
         .attr('opacity', 0);
     labels.exit().remove();
     renderLabels();
+
+    // Render the label of the whole StreamGraph.
+    selection.call(labelComponent, props);
   });
 
 export default StreamGraph;
