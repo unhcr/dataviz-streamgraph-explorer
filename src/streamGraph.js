@@ -51,12 +51,20 @@ const colorScale = scaleOrdinal().range(schemeCategory10);
 const streamLocal = local();
 
 // The component that will render the label.
+const labelOffsetX = 15;
+const labelOffsetY = 2;
 const labelComponent = component('text', 'label')
-  .render((selection, props) => {
+  .create((selection, props) => {
     selection
+        .attr('x', labelOffsetX)
+        .attr('y', labelOffsetY)
         .attr('alignment-baseline', 'hanging')
-        .attr('font-size', '2em')
-        .text(props.label)
+        .attr('font-size', '1.5em')
+        .attr('font-weight', '700')
+        .style('text-transform', 'uppercase');
+  })
+  .render((selection, props) => {
+    selection.text(props.label);
   });
 
 // The d3-component for StreamGraph, exported from this module.
