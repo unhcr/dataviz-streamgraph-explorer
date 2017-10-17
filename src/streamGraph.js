@@ -96,6 +96,7 @@ const StreamGraph = component('g')
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
     const xScale = props.xScale;
+    const label = props.label;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -180,7 +181,9 @@ const StreamGraph = component('g')
     renderLabels();
 
     // Render the label of the whole StreamGraph.
-    selection.call(labelComponent, props);
+    selection.call(labelComponent, {
+      label: stacked.length > 1 ? label.plural : label.singular
+    });
   });
 
 export default StreamGraph;
