@@ -7,13 +7,15 @@ const yValue = d => d.name;
 const commaFormat = format(',');
 
 const xScale = scaleLinear();
-const yScale = scaleBand().paddingInner(0.2);
+const yScale = scaleBand()
+  .paddingInner(0.2)
+  .paddingOuter(0);
 
 const margin = { left: 160, right: 70, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-export default (selection, data) => {
+export default (selection, { data, maxCountries }) => {
 
   const width = selection.attr('width');
   const height = selection.attr('height');
@@ -21,13 +23,17 @@ export default (selection, data) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
+  // Make each bar this many pixels high.
+  // Fit 20 bars on screen as the maximum number.
+  const barHeight = innerHeight / maxCountries;
+
   xScale
     .domain([0, max(data, xValue)])
     .range([0, innerWidth]);
 
   yScale
     .domain(data.map(yValue))
-    .range([0, innerHeight]);
+    .range([0, barHeight * data.length]);
 
   let g = selection.selectAll('g').data([null]);
   g = g.enter().append('g')

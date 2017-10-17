@@ -4,10 +4,10 @@ import { descending, sum } from 'd3-array';
 import detailsBarChart from './detailsBarChart';
 
 // The top n countries are shown.
-const n = 20;
+const maxCountries = 20;
 
 // Takes the first n elements of the data array.
-const topN = data => data.slice(0, n);
+const topN = data => data.slice(0, maxCountries);
 
 // Formats a number with commas, e.g. 1,000,000
 const commaFormat = format(',');
@@ -48,7 +48,7 @@ export default function (selection, year, srcData, destData) {
   let label;
   let value;
   let data = [];
-  let barsLabel = `Top ${n} origin countries`;
+  let barsLabel = `Top ${maxCountries} origin countries`;
 
   // Handle each of these cases:
   // - no data (zero)
@@ -67,7 +67,7 @@ export default function (selection, year, srcData, destData) {
     label = `Total from ${src.name}`;
     value = commaFormat(src.value);
     data = yearDestData;
-    barsLabel = `Top ${n} destination countries`;
+    barsLabel = `Top ${maxCountries} destination countries`;
   } else if (multipleSrc && singleDest) {
     label = `Total to ${dest.name}`;
     value = commaFormat(dest.value);
@@ -81,5 +81,9 @@ export default function (selection, year, srcData, destData) {
   select('#details-statistic-label').text(label);
   select('#details-statistic-value').text(value);
   select('#details-bars-label').text(barsLabel);
-  selection.call(detailsBarChart, topN(data));
+
+  selection.call(detailsBarChart, {
+    data: topN(data),
+    maxCountries
+  });
 };
