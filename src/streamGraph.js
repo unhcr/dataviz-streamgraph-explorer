@@ -51,9 +51,11 @@ const colorScale = scaleOrdinal().range(schemeCategory10);
 const streamLocal = local();
 
 // The component that will render the label.
-const labelComponent = component('text')
+const labelComponent = component('text', 'label')
   .render((selection, props) => {
     selection
+        .attr('alignment-baseline', 'hanging')
+        .attr('font-size', '2em')
         .text(props.label)
   });
 
@@ -73,7 +75,7 @@ const StreamGraph = component('g')
 
     // The debounced function that positions and reveals labels.
     const renderLabels = debounce(() => {
-      selection.selectAll('text')
+      selection.selectAll('.area-label')
           .attr('transform', areaLabel(streamArea))
           .attr('opacity', .7);
     }, 500);
@@ -164,9 +166,11 @@ const StreamGraph = component('g')
     paths.exit().remove();
 
     // Render the area labels.
-    const labels = selection.selectAll('text').data(stacked);
+    const labels = selection
+      .selectAll('.area-label').data(stacked);
     labels
       .enter().append('text')
+        .attr('class', 'area-label')
         .style('pointer-events', 'none')
         .attr('fill', 'white')
       .merge(labels)
