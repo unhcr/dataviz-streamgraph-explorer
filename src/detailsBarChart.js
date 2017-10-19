@@ -7,6 +7,12 @@ const yValue = d => d.name;
 const commaFormat = format(',');
 const labelValue = d => yValue(d) + ': ' + commaFormat(xValue(d));
 
+// The fraction of the bar height used by the bar label text.
+const fontScale = 0.7;
+
+// Determines the width of the stroke behind the bar label text.
+const strokeScale = 0.15;
+
 const xScale = scaleLinear();
 const yScale = scaleBand()
   .paddingInner(0.2)
@@ -59,24 +65,30 @@ export default (selection, { data, maxCountries }) => {
       .attr('width', d => xScale(xValue(d)))
       .attr('height', yScale.bandwidth());
 
-  // Render the labels on the left.
+  const fontSize = barHeight * fontScale + 'px';
+
+  // Render the labels in the back with stroke.
   barsEnter
     .append('text')
-      .attr('class', 'name-label')
+      .attr('class', 'back-text')
       .attr('dy', '0.32em')
       .attr('x', labelPadding)
-    .merge(bars.select('.name-label'))
+      .attr('stroke', 'white')
+      .attr('stroke-linejoin', 'round')
+    .merge(bars.select('.back-text'))
+      .attr('font-size', fontSize)
+      .attr('stroke-width', barHeight * strokeScale)
       .attr('y', yScale.bandwidth() / 2)
       .text(labelValue);
 
-//  // Render the labels on the right.
-//  barsEnter
-//    .append('text')
-//      .attr('class', 'value-label')
-//      .attr('dy', '0.32em')
-//      .attr('text-anchor', 'start')
-//    .merge(bars.select('.value-label'))
-//      .attr('y', yScale.bandwidth() / 2)
-//      .attr('x', d => xScale(xValue(d)) + labelPadding)
-//      .text(d => commaFormat(xValue(d)));
+  // Render the labels in the front without stroke.
+  barsEnter
+    .append('text')
+      .attr('class', 'front-text')
+      .attr('dy', '0.32em')
+      .attr('x', labelPadding)
+    .merge(bars.select('.front-text'))
+      .attr('font-size', fontSize)
+      .attr('y', yScale.bandwidth() / 2)
+      .text(labelValue);
 }
