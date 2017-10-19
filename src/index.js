@@ -190,6 +190,7 @@ dataFlow('focusXScale', (() => {
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(StreamGraph, [
     {
+      label: { singular: 'Origin', plural: 'Origins' },
       margin,
       xScale,
       data: srcDataReduced,
@@ -198,6 +199,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, 
       onYearSelect: setIfChanged(dataFlow.year)
     },
     {
+      label: { singular: 'Destination', plural: 'Destinations' },
       margin,
       xScale,
       data: destDataReduced,
