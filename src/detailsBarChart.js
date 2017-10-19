@@ -5,6 +5,7 @@ import { format } from 'd3-format';
 const xValue = d => d.value;
 const yValue = d => d.name;
 const commaFormat = format(',');
+const labelValue = d => yValue(d) + ': ' + commaFormat(xValue(d));
 
 const xScale = scaleLinear();
 const yScale = scaleBand()
@@ -66,7 +67,7 @@ export default (selection, { data, maxCountries }) => {
       .attr('x', labelPadding)
     .merge(bars.select('.name-label'))
       .attr('y', yScale.bandwidth() / 2)
-      .text(yValue);
+      .text(labelValue);
 
 //  // Render the labels on the right.
 //  barsEnter
