@@ -11,7 +11,7 @@ const yScale = scaleBand()
   .paddingInner(0.2)
   .paddingOuter(0);
 
-const margin = { left: 160, right: 70, top: 0, bottom: 0 };
+const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
@@ -42,8 +42,7 @@ export default (selection, { data, maxCountries }) => {
 
   // Each "bar" is a group that will contain
   //  - a rectangle
-  //  - a label on the left (name)
-  //  - a label on the right (value)
+  //  - a label on top of the bar (name + value)
   const bars = g.selectAll('g').data(data);
   const barsEnter = bars.enter().append('g');
   bars.exit().remove();
@@ -64,20 +63,19 @@ export default (selection, { data, maxCountries }) => {
     .append('text')
       .attr('class', 'name-label')
       .attr('dy', '0.32em')
-      .attr('x', -labelPadding)
-      .attr('text-anchor', 'end')
+      .attr('x', labelPadding)
     .merge(bars.select('.name-label'))
       .attr('y', yScale.bandwidth() / 2)
       .text(yValue);
 
-  // Render the labels on the right.
-  barsEnter
-    .append('text')
-      .attr('class', 'value-label')
-      .attr('dy', '0.32em')
-      .attr('text-anchor', 'start')
-    .merge(bars.select('.value-label'))
-      .attr('y', yScale.bandwidth() / 2)
-      .attr('x', d => xScale(xValue(d)) + labelPadding)
-      .text(d => commaFormat(xValue(d)));
+//  // Render the labels on the right.
+//  barsEnter
+//    .append('text')
+//      .attr('class', 'value-label')
+//      .attr('dy', '0.32em')
+//      .attr('text-anchor', 'start')
+//    .merge(bars.select('.value-label'))
+//      .attr('y', yScale.bandwidth() / 2)
+//      .attr('x', d => xScale(xValue(d)) + labelPadding)
+//      .text(d => commaFormat(xValue(d)));
 }
