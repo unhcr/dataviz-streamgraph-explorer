@@ -6012,6 +6012,7 @@ dataFlow('focusXScale', (() => {
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(__WEBPACK_IMPORTED_MODULE_8__streamGraph__["a" /* default */], [
     {
+      label: { singular: 'Origin', plural: 'Origins' },
       margin,
       xScale,
       data: srcDataReduced,
@@ -6020,6 +6021,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, 
       onYearSelect: Object(__WEBPACK_IMPORTED_MODULE_16__setIfChanged__["a" /* default */])(dataFlow.year)
     },
     {
+      label: { singular: 'Destination', plural: 'Destinations' },
       margin,
       xScale,
       data: destDataReduced,
@@ -11023,6 +11025,23 @@ const colorScale = Object(__WEBPACK_IMPORTED_MODULE_2_d3_scale__["scaleOrdinal"]
 // The d3 local that stores things local to each StreamGraph instance.
 const streamLocal = Object(__WEBPACK_IMPORTED_MODULE_5_d3_selection__["c" /* local */])();
 
+// The component that will render the label.
+const labelOffsetX = 15;
+const labelOffsetY = 2;
+const labelComponent = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* component */])('text', 'label')
+  .create((selection, props) => {
+    selection
+        .attr('x', labelOffsetX)
+        .attr('y', labelOffsetY)
+        .attr('alignment-baseline', 'hanging')
+        .attr('font-size', '1.5em')
+        .attr('font-weight', '700')
+        .style('text-transform', 'uppercase');
+  })
+  .render((selection, props) => {
+    selection.text(props.label);
+  });
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* component */])('g')
   .create((selection, props) => {
@@ -11039,7 +11058,7 @@ const StreamGraph = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* com
 
     // The debounced function that positions and reveals labels.
     const renderLabels = __WEBPACK_IMPORTED_MODULE_7_lodash_debounce___default()(() => {
-      selection.selectAll('text')
+      selection.selectAll('.area-label')
           .attr('transform', Object(__WEBPACK_IMPORTED_MODULE_6_d3_area_label__["areaLabel"])(streamArea))
           .attr('opacity', .7);
     }, 500);
@@ -11060,6 +11079,7 @@ const StreamGraph = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* com
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
     const xScale = props.xScale;
+    const label = props.label;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -11129,10 +11149,12 @@ const StreamGraph = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* com
         .on('mousemove', Object(__WEBPACK_IMPORTED_MODULE_10__invokeWithYear__["a" /* default */])(onYearSelect, selection, xScale));
     paths.exit().remove();
 
-    // Render the labels.
-    const labels = selection.selectAll('text').data(stacked);
+    // Render the area labels.
+    const labels = selection
+      .selectAll('.area-label').data(stacked);
     labels
       .enter().append('text')
+        .attr('class', 'area-label')
         .style('pointer-events', 'none')
         .attr('fill', 'white')
       .merge(labels)
@@ -11140,6 +11162,11 @@ const StreamGraph = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* com
         .attr('opacity', 0);
     labels.exit().remove();
     renderLabels();
+
+    // Render the label of the whole StreamGraph.
+    selection.call(labelComponent, {
+      label: stacked.length > 1 ? label.plural : label.singular
+    });
   });
 
 /* harmony default export */ __webpack_exports__["a"] = (StreamGraph);
@@ -14561,10 +14588,10 @@ const selectedYearLine = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /
 
 
 // The top n countries are shown.
-const n = 20;
+const maxCountries = 20;
 
 // Takes the first n elements of the data array.
-const topN = data => data.slice(0, n);
+const topN = data => data.slice(0, maxCountries);
 
 // Formats a number with commas, e.g. 1,000,000
 const commaFormat = Object(__WEBPACK_IMPORTED_MODULE_0_d3_format__["a" /* format */])(',');
@@ -14605,7 +14632,7 @@ function getYearData(year, data){
   let label;
   let value;
   let data = [];
-  let barsLabel = `Top ${n} origin countries`;
+  let barsLabel = `Top ${maxCountries} origin countries`;
 
   // Handle each of these cases:
   // - no data (zero)
@@ -14624,7 +14651,7 @@ function getYearData(year, data){
     label = `Total from ${src.name}`;
     value = commaFormat(src.value);
     data = yearDestData;
-    barsLabel = `Top ${n} destination countries`;
+    barsLabel = `Top ${maxCountries} destination countries`;
   } else if (multipleSrc && singleDest) {
     label = `Total to ${dest.name}`;
     value = commaFormat(dest.value);
@@ -14638,7 +14665,11 @@ function getYearData(year, data){
   Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["g" /* select */])('#details-statistic-label').text(label);
   Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["g" /* select */])('#details-statistic-value').text(value);
   Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["g" /* select */])('#details-bars-label').text(barsLabel);
-  selection.call(__WEBPACK_IMPORTED_MODULE_3__detailsBarChart__["a" /* default */], topN(data));
+
+  selection.call(__WEBPACK_IMPORTED_MODULE_3__detailsBarChart__["a" /* default */], {
+    data: topN(data),
+    maxCountries
+  });
 });;
 
 
@@ -14659,13 +14690,15 @@ const yValue = d => d.name;
 const commaFormat = Object(__WEBPACK_IMPORTED_MODULE_2_d3_format__["a" /* format */])(',');
 
 const xScale = Object(__WEBPACK_IMPORTED_MODULE_0_d3_scale__["scaleLinear"])();
-const yScale = Object(__WEBPACK_IMPORTED_MODULE_0_d3_scale__["scaleBand"])().paddingInner(0.2);
+const yScale = Object(__WEBPACK_IMPORTED_MODULE_0_d3_scale__["scaleBand"])()
+  .paddingInner(0.2)
+  .paddingOuter(0);
 
 const margin = { left: 160, right: 70, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-/* harmony default export */ __webpack_exports__["a"] = ((selection, data) => {
+/* harmony default export */ __webpack_exports__["a"] = ((selection, { data, maxCountries }) => {
 
   const width = selection.attr('width');
   const height = selection.attr('height');
@@ -14673,13 +14706,17 @@ const labelPadding = 3;
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
+  // Make each bar this many pixels high.
+  // Fit 20 bars on screen as the maximum number.
+  const barHeight = innerHeight / maxCountries;
+
   xScale
     .domain([0, Object(__WEBPACK_IMPORTED_MODULE_1_d3_array__["max"])(data, xValue)])
     .range([0, innerWidth]);
 
   yScale
     .domain(data.map(yValue))
-    .range([0, innerHeight]);
+    .range([0, barHeight * data.length]);
 
   let g = selection.selectAll('g').data([null]);
   g = g.enter().append('g')
