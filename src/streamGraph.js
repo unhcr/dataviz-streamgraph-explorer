@@ -50,6 +50,23 @@ const colorScale = scaleOrdinal().range(schemeCategory10);
 // The d3 local that stores things local to each StreamGraph instance.
 const streamLocal = local();
 
+// The component that will render the label.
+const labelOffsetX = 15;
+const labelOffsetY = 2;
+const labelComponent = component('text', 'label')
+  .create((selection, props) => {
+    selection
+        .attr('x', labelOffsetX)
+        .attr('y', labelOffsetY)
+        .attr('alignment-baseline', 'hanging')
+        .attr('font-size', '1.5em')
+        .attr('font-weight', '700')
+        .style('text-transform', 'uppercase');
+  })
+  .render((selection, props) => {
+    selection.text(props.label);
+  });
+
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
   .create((selection, props) => {
@@ -66,7 +83,7 @@ const StreamGraph = component('g')
 
     // The debounced function that positions and reveals labels.
     const renderLabels = debounce(() => {
-      selection.selectAll('text')
+      selection.selectAll('.area-label')
           .attr('transform', areaLabel(streamArea))
           .attr('opacity', .7);
     }, 500);
@@ -87,6 +104,7 @@ const StreamGraph = component('g')
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
     const xScale = props.xScale;
+    const label = props.label;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -156,10 +174,12 @@ const StreamGraph = component('g')
         .on('mousemove', invokeWithYear(onYearSelect, selection, xScale));
     paths.exit().remove();
 
-    // Render the labels.
-    const labels = selection.selectAll('text').data(stacked);
+    // Render the area labels.
+    const labels = selection
+      .selectAll('.area-label').data(stacked);
     labels
       .enter().append('text')
+        .attr('class', 'area-label')
         .style('pointer-events', 'none')
         .attr('fill', 'white')
       .merge(labels)
@@ -167,6 +187,11 @@ const StreamGraph = component('g')
         .attr('opacity', 0);
     labels.exit().remove();
     renderLabels();
+
+    // Render the label of the whole StreamGraph.
+    selection.call(labelComponent, {
+      label: stacked.length > 1 ? label.plural : label.singular
+    });
   });
 
 export default StreamGraph;
