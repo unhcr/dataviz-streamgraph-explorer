@@ -34,8 +34,13 @@ export default function (selection, year, srcData, destData) {
   const yearSrcData = getYearData(year, srcData);
   const yearDestData = getYearData(year, destData);
 
+  const data = {
+    yearSrcData,
+    yearDestData
+  };
+
   // Figure out if there are multipld src/dest.
-  const zeroSrc = yearSrcData.length === 0;
+  const zeroSrc = data => data.yearSrcData.length === 0;
   const zeroDest = yearDestData.length === 0;
   const multipleSrc = yearSrcData.length > 1;
   const multipleDest = yearDestData.length > 1;
@@ -47,7 +52,7 @@ export default function (selection, year, srcData, destData) {
 
   let label;
   let value;
-  let data = [];
+  let barsData = [];
   let barsLabel = `Top ${maxCountries} origin countries`;
 
   // Handle each of these cases:
@@ -56,22 +61,22 @@ export default function (selection, year, srcData, destData) {
   // - single src, multiple dest
   // - multiple src, single dest
   // - single src, single dest
-  if (zeroSrc || zeroDest) {
+  if (zeroSrc(data) || zeroDest) {
     label = '';
     value = '';
   } else if (multipleSrc && multipleDest) {
     label = `Total from origins to destinations`;
     value = commaFormat(sum(yearSrcData, d => d.value));
-    data = yearSrcData;
+    barsData = yearSrcData;
   } else if (singleSrc && multipleDest) {
     label = `Total from ${src.name}`;
     value = commaFormat(src.value);
-    data = yearDestData;
+    barsData = yearDestData;
     barsLabel = `Top ${maxCountries} destination countries`;
   } else if (multipleSrc && singleDest) {
     label = `Total to ${dest.name}`;
     value = commaFormat(dest.value);
-    data = yearSrcData;
+    barsData = yearSrcData;
   } else if (singleSrc && singleDest) {
     label = `Total from ${src.name} to ${dest.name}`;
     value = commaFormat(dest.value); // Same as src.value
@@ -83,7 +88,7 @@ export default function (selection, year, srcData, destData) {
   select('#details-bars-label').text(barsLabel);
 
   selection.call(detailsBarChart, {
-    data: topN(data),
+    data: topN(barsData),
     maxCountries
   });
 };
