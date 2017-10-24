@@ -48,7 +48,7 @@ const value = data => {
   let number;
 
   if (multipleSrc(data) && multipleDest(data)) {
-    number = sum(yearSrcData, d => d.value);
+    number = sum(data.yearSrcData, d => d.value);
   } else if (singleSrc(data) && multipleDest(data)) {
     number = src(data).value;
   } else if (multipleSrc(data) && singleDest(data)) {
@@ -70,6 +70,21 @@ const barsData = data => {
     return data.yearSrcData;
   }
   return [];
+}
+
+// Compute the label to show as the title for the bars.
+const barsLabel = data => {
+  if (zeroSrc(data) || zeroDest(data)) {
+    return `Top ${maxCountries} origin countries`;
+  } else if (multipleSrc(data) && multipleDest(data)) {
+    return `Top ${maxCountries} origin countries`;
+  } else if (singleSrc(data) && multipleDest(data)) {
+    return `Top ${maxCountries} destination countries`;
+  } else if (multipleSrc(data) && singleDest(data)) {
+    return `Top ${maxCountries} origin countries`;
+  } else if (singleSrc(data) && singleDest(data)) {
+    return '';
+  }
 }
 
 // Extracts the data for the given year,
@@ -99,26 +114,9 @@ export default function (selection, year, srcData, destData) {
     yearDestData
   };
 
-  let barsLabel = `Top ${maxCountries} origin countries`;
-
-  // Handle each of these cases:
-  // - no data (zero)
-  // - multiple src, multiple dest
-  // - single src, multiple dest
-  // - multiple src, single dest
-  // - single src, single dest
-  if (zeroSrc(data) || zeroDest(data)) {
-  } else if (multipleSrc(data) && multipleDest(data)) {
-  } else if (singleSrc(data) && multipleDest(data)) {
-    barsLabel = `Top ${maxCountries} destination countries`;
-  } else if (multipleSrc(data) && singleDest(data)) {
-  } else if (singleSrc(data) && singleDest(data)) {
-    barsLabel = '';
-  }
-
   select('#details-statistic-label').text(label(data));
   select('#details-statistic-value').text(value(data));
-  select('#details-bars-label').text(barsLabel);
+  select('#details-bars-label').text(barsLabel(data));
 
   selection.call(detailsBarChart, {
     data: topN(barsData(data)),
