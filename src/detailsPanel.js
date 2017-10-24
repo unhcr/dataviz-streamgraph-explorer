@@ -60,6 +60,18 @@ const value = data => {
   return commaFormat(number);
 };
 
+// Compute the data shown in the bars.
+const barsData = data => {
+  if (multipleSrc(data) && multipleDest(data)) {
+    return data.yearSrcData;
+  } else if (singleSrc(data) && multipleDest(data)) {
+    return data.yearDestData;
+  } else if (multipleSrc(data) && singleDest(data)) {
+    return data.yearSrcData;
+  }
+  return [];
+}
+
 // Extracts the data for the given year,
 // and transforms it into a sorted array.
 function getYearData(year, data){
@@ -87,7 +99,6 @@ export default function (selection, year, srcData, destData) {
     yearDestData
   };
 
-  let barsData = [];
   let barsLabel = `Top ${maxCountries} origin countries`;
 
   // Handle each of these cases:
@@ -98,12 +109,9 @@ export default function (selection, year, srcData, destData) {
   // - single src, single dest
   if (zeroSrc(data) || zeroDest(data)) {
   } else if (multipleSrc(data) && multipleDest(data)) {
-    barsData = yearSrcData;
   } else if (singleSrc(data) && multipleDest(data)) {
-    barsData = yearDestData;
     barsLabel = `Top ${maxCountries} destination countries`;
   } else if (multipleSrc(data) && singleDest(data)) {
-    barsData = yearSrcData;
   } else if (singleSrc(data) && singleDest(data)) {
     barsLabel = '';
   }
@@ -113,7 +121,7 @@ export default function (selection, year, srcData, destData) {
   select('#details-bars-label').text(barsLabel);
 
   selection.call(detailsBarChart, {
-    data: topN(barsData),
+    data: topN(barsData(data)),
     maxCountries
   });
 };
