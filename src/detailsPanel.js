@@ -12,6 +12,18 @@ const topN = data => data.slice(0, maxCountries);
 // Formats a number with commas, e.g. 1,000,000
 const commaFormat = format(',');
 
+// Figure out if there are zero, multiple, or single src/dest.
+const zeroSrc = data => data.yearSrcData.length === 0;
+const zeroDest = data => data.yearDestData.length === 0;
+const multipleSrc = data => data.yearSrcData.length > 1;
+const multipleDest = data => data.yearDestData.length > 1;
+const singleSrc = data => !multipleSrc(data);
+const singleDest = data => !multipleDest(data);
+
+// These accessors extract the single source and destination.
+const src = data => data.yearSrcData[0];
+const dest = data => data.yearDestData[0];
+
 // Extracts the data for the given year,
 // and transforms it into a sorted array.
 function getYearData(year, data){
@@ -39,17 +51,6 @@ export default function (selection, year, srcData, destData) {
     yearDestData
   };
 
-  // Figure out if there are multipld src/dest.
-  const zeroSrc = data => data.yearSrcData.length === 0;
-  const zeroDest = yearDestData.length === 0;
-  const multipleSrc = yearSrcData.length > 1;
-  const multipleDest = yearDestData.length > 1;
-  const singleSrc = !multipleSrc;
-  const singleDest = !multipleDest;
-
-  const src = yearSrcData[0];
-  const dest = yearDestData[0];
-
   let label;
   let value;
   let barsData = [];
@@ -61,25 +62,25 @@ export default function (selection, year, srcData, destData) {
   // - single src, multiple dest
   // - multiple src, single dest
   // - single src, single dest
-  if (zeroSrc(data) || zeroDest) {
+  if (zeroSrc(data) || zeroDest(data)) {
     label = '';
     value = '';
-  } else if (multipleSrc && multipleDest) {
+  } else if (multipleSrc(data) && multipleDest(data)) {
     label = `Total from origins to destinations`;
     value = commaFormat(sum(yearSrcData, d => d.value));
     barsData = yearSrcData;
-  } else if (singleSrc && multipleDest) {
-    label = `Total from ${src.name}`;
-    value = commaFormat(src.value);
+  } else if (singleSrc(data) && multipleDest(data)) {
+    label = `Total from ${src(data).name}`;
+    value = commaFormat(src(data).value);
     barsData = yearDestData;
     barsLabel = `Top ${maxCountries} destination countries`;
-  } else if (multipleSrc && singleDest) {
-    label = `Total to ${dest.name}`;
-    value = commaFormat(dest.value);
+  } else if (multipleSrc(data) && singleDest(data)) {
+    label = `Total to ${dest(data).name}`;
+    value = commaFormat(dest(data).value);
     barsData = yearSrcData;
-  } else if (singleSrc && singleDest) {
-    label = `Total from ${src.name} to ${dest.name}`;
-    value = commaFormat(dest.value); // Same as src.value
+  } else if (singleSrc(data) && singleDest(data)) {
+    label = `Total from ${src(data).name} to ${dest(data).name}`;
+    value = commaFormat(dest(data).value); // Same as src.value
     barsLabel = '';
   }
 
