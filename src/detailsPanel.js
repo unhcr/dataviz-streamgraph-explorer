@@ -74,17 +74,25 @@ const barsData = data => {
 
 // Compute the label to show as the title for the bars.
 const barsLabel = data => {
-  if (zeroSrc(data) || zeroDest(data)) {
-    return `Top ${maxCountries} origin countries`;
-  } else if (multipleSrc(data) && multipleDest(data)) {
-    return `Top ${maxCountries} origin countries`;
-  } else if (singleSrc(data) && multipleDest(data)) {
-    return `Top ${maxCountries} destination countries`;
-  } else if (multipleSrc(data) && singleDest(data)) {
-    return `Top ${maxCountries} origin countries`;
-  } else if (singleSrc(data) && singleDest(data)) {
-    return '';
+  const barsDataLength = barsData(data).length;
+
+  if (multipleSrc(data)) {
+    if (barsDataLength > maxCountries) {
+      return `Top ${maxCountries} origin countries`;
+    } else {
+      return 'Origin countries';
+    }
   }
+
+  if (multipleDest(data)) {
+    if (barsDataLength > maxCountries) {
+      return `Top ${maxCountries} destination countries`;
+    } else {
+      return 'Destination countries';
+    }
+  }
+
+  return '';
 }
 
 // Extracts the data for the given year,
@@ -109,15 +117,10 @@ export default function (selection, year, srcData, destData) {
   const yearSrcData = getYearData(year, srcData);
   const yearDestData = getYearData(year, destData);
 
-  const data = {
-    yearSrcData,
-    yearDestData
-  };
-
+  const data = { yearSrcData, yearDestData };
   select('#details-statistic-label').text(label(data));
   select('#details-statistic-value').text(value(data));
   select('#details-bars-label').text(barsLabel(data));
-
   selection.call(detailsBarChart, {
     data: topN(barsData(data)),
     maxCountries
