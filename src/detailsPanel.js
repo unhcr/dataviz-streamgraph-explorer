@@ -12,6 +12,89 @@ const topN = data => data.slice(0, maxCountries);
 // Formats a number with commas, e.g. 1,000,000
 const commaFormat = format(',');
 
+// Figure out if there are zero, multiple, or single src/dest.
+const zeroSrc = data => data.yearSrcData.length === 0;
+const zeroDest = data => data.yearDestData.length === 0;
+const multipleSrc = data => data.yearSrcData.length > 1;
+const multipleDest = data => data.yearDestData.length > 1;
+const singleSrc = data => !multipleSrc(data);
+const singleDest = data => !multipleDest(data);
+
+// These accessors extract the single source and destination.
+const src = data => data.yearSrcData[0];
+const dest = data => data.yearDestData[0];
+
+// Compute the label for the statistic.
+const label = data => {
+  if (zeroSrc(data) || zeroDest(data)) {
+    return '';
+  } else if (multipleSrc(data) && multipleDest(data)) {
+    return `Total from origins to destinations`;
+  } else if (singleSrc(data) && multipleDest(data)) {
+    return `Total from ${src(data).name}`;
+  } else if (multipleSrc(data) && singleDest(data)) {
+    return `Total to ${dest(data).name}`;
+  } else if (singleSrc(data) && singleDest(data)) {
+    return `Total from ${src(data).name} to ${dest(data).name}`;
+  }
+};
+
+// Compute the value for the statistic.
+const value = data => {
+  if (zeroSrc(data) || zeroDest(data)) {
+    return '';
+  }
+
+  let number;
+
+  if (multipleSrc(data) && multipleDest(data)) {
+    number = sum(data.yearSrcData, d => d.value);
+  } else if (singleSrc(data) && multipleDest(data)) {
+    number = src(data).value;
+  } else if (multipleSrc(data) && singleDest(data)) {
+    number = dest(data).value;
+  } else if (singleSrc(data) && singleDest(data)) {
+    number = dest(data).value; // Same as src.value
+  }
+
+  return commaFormat(number);
+};
+
+// Compute the data shown in the bars.
+const barsData = data => {
+  if (multipleSrc(data) && multipleDest(data)) {
+    return data.yearSrcData;
+  } else if (singleSrc(data) && multipleDest(data)) {
+    return data.yearDestData;
+  } else if (multipleSrc(data) && singleDest(data)) {
+    return data.yearSrcData;
+  }
+  return [];
+}
+
+// Compute the label to show as the title for the bars.
+const barsLabel = data => {
+  const barsDataLength = barsData(data).length;
+
+  if (multipleSrc(data)) {
+    if (barsDataLength > maxCountries) {
+      return `Top ${maxCountries} origin countries`;
+    } else {
+      return 'Origin countries';
+    }
+  }
+
+  if (multipleDest(data)) {
+    if (barsDataLength > maxCountries) {
+      return `Top ${maxCountries} destination countries`;
+    } else {
+      return 'Destination countries';
+    }
+  }
+
+  return '';
+}
+
 // Extracts the data for the given year,
 // and transforms it into a sorted array.
 function getYearData(year, data){
@@ -34,56 +117,12 @@ export default function (selection, year, srcData, destData) {
   const yearSrcData = getYearData(year, srcData);
   const yearDestData = getYearData(year, destData);
 
-  // Figure out if there are multipld src/dest.
-  const zeroSrc = yearSrcData.length === 0;
-  const zeroDest = yearDestData.length === 0;
-  const multipleSrc = yearSrcData.length > 1;
-  const multipleDest = yearDestData.length > 1;
-  const singleSrc = !multipleSrc;
-  const singleDest = !multipleDest;
-
-  const src = yearSrcData[0];
-  const dest = yearDestData[0];
-
-  let label;
-  let value;
-  let data = [];
-  let barsLabel = `Top ${maxCountries} origin countries`;
-
-  // Handle each of these cases:
-  // - no data (zero)
-  // - multiple src, multiple dest
-  // - single src, multiple dest
-  // - multiple src, single dest
-  // - single src, single dest
-  if (zeroSrc || zeroDest) {
-    label = '';
-    value = '';
-  } else if (multipleSrc && multipleDest) {
-    label = `Total from origins to destinations`;
-    value = commaFormat(sum(yearSrcData, d => d.value));
-    data = yearSrcData;
-  } else if (singleSrc && multipleDest) {
-    label = `Total from ${src.name}`;
-    value = commaFormat(src.value);
-    data = yearDestData;
-    barsLabel = `Top ${maxCountries} destination countries`;
-  } else if (multipleSrc && singleDest) {
-    label = `Total to ${dest.name}`;
-    value = commaFormat(dest.value);
-    data = yearSrcData;
-  } else if (singleSrc && singleDest) {
-    label = `Total from ${src.name} to ${dest.name}`;
-    value = commaFormat(dest.value); // Same as src.value
-    barsLabel = '';
-  }
-
-  select('#details-statistic-label').text(label);
-  select('#details-statistic-value').text(value);
-  select('#details-bars-label').text(barsLabel);
-
+  const data = { yearSrcData, yearDestData };
+  select('#details-statistic-label').text(label(data));
+  select('#details-statistic-value').text(value(data));
+  select('#details-bars-label').text(barsLabel(data));
   selection.call(detailsBarChart, {
-    data: topN(data),
+    data: topN(barsData(data)),
     maxCountries
   });
 };
