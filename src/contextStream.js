@@ -50,7 +50,7 @@ const contextBrushComponent = component('g')
 
 const contextStream = (selection, props) => {
   xScale
-    .domain(extent(props.data, xValue))
+    .domain(props.timeExtent)
     .range([0, props.box.width]);
   yScale
     .domain([0, max(props.data, yValue)])

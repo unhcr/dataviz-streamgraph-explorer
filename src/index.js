@@ -229,14 +229,15 @@ dataFlow((box, year, xScale) => {
 }, 'focusBox, year, focusXScale');
 
 // Render the context stream.
-dataFlow((box, zoom, srcData) => {
+dataFlow((box, zoom, srcData, timeExtent) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
     zoom,
     data: contextStreamData(srcData),
-    onBrush: dataFlow.zoom
+    onBrush: dataFlow.zoom,
+    timeExtent
   });
-}, 'contextStreamBox, zoom, srcData');
+}, 'contextStreamBox, zoom, srcData, timeExtent');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
