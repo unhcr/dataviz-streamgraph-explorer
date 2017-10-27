@@ -17,6 +17,7 @@ import detailsPanel from './detailsPanel';
 import setIfChanged from './setIfChanged';
 import contextStream from './contextStream';
 import contextStreamData from './contextStreamData';
+import colorScale from './colorScale';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -185,7 +186,6 @@ dataFlow('focusXScale', (() => {
   };
 })(), 'timeExtent, zoom, focusBox, focusMargin');
 
-
 // Render the source and destination StreamGraphs.
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(StreamGraph, [
@@ -193,6 +193,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, 
       label: { singular: 'Origin', plural: 'Origins' },
       margin,
       xScale,
+      colorScale,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src,
@@ -202,6 +203,7 @@ dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, 
       label: { singular: 'Destination', plural: 'Destinations' },
       margin,
       xScale,
+      colorScale,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest,
