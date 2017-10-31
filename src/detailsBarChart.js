@@ -15,7 +15,7 @@ const margin = { left: 160, right: 70, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-export default (selection, { data, maxCountries }) => {
+export default (selection, { data, maxCountries, colorScale }) => {
 
   const width = selection.attr('width');
   const height = selection.attr('height');
@@ -54,8 +54,8 @@ export default (selection, { data, maxCountries }) => {
   // Render the rectangles.
   barsEnter
     .append('rect')
-      .attr('fill', 'steelblue')
     .merge(bars.select('rect'))
+      .attr('fill', d => colorScale(yValue(d)))
       .attr('width', d => xScale(xValue(d)))
       .attr('height', yScale.bandwidth());
 
