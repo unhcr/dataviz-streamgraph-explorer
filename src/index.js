@@ -168,7 +168,7 @@ dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
 dataFlow('detailsPanel', (year, srcData, destData) => {
-  detailsSVG.call(detailsPanel, year, srcData, destData);
+  detailsSVG.call(detailsPanel, year, srcData, destData, colorScale);
 }, 'year, srcData, destData')
 
 // Reduce the data to show only the largest areas.

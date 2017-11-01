@@ -111,7 +111,7 @@ function getYearData(year, data){
 
 // This is the top-level component that manages the
 // elements within the details view.
-export default function (selection, year, srcData, destData) {
+export default function (selection, year, srcData, destData, colorScale) {
 
   // Compute the filtered data for the selected year.
   const yearSrcData = getYearData(year, srcData);
@@ -123,6 +123,7 @@ export default function (selection, year, srcData, destData) {
   select('#details-bars-label').text(barsLabel(data));
   selection.call(detailsBarChart, {
     data: topN(barsData(data)),
-    maxCountries
+    maxCountries,
+    colorScale
   });
 };
