@@ -1,6 +1,6 @@
 import { component } from 'd3-component';
 import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 'd3-shape';
-import { scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
+import { scaleLinear } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
 import { local } from 'd3-selection';
@@ -43,9 +43,6 @@ const forStacking = data => Object.keys(data)
 
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
-
-// Create the x, y, and color scales.
-const colorScale = scaleOrdinal().range(schemeCategory10);
 
 // The d3 local that stores things local to each StreamGraph instance.
 const streamLocal = local();
@@ -104,6 +101,8 @@ const StreamGraph = component('g')
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
     const xScale = props.xScale;
+    const colorScale = props.colorScale;
+
     const label = props.label;
 
     // Unpack local objects.
@@ -154,8 +153,8 @@ const StreamGraph = component('g')
         .style('cursor', 'pointer')
         .attr('fill-opacity', .8)
       .merge(paths)
-        .attr('fill', d => colorScale(d.index))
-        .attr('stroke', d => colorScale(d.index))
+        .attr('fill', d => colorScale(d.key))
+        .attr('stroke', d => colorScale(d.key))
         .attr('d', streamArea)
         .on('click', d => {
 
