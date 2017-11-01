@@ -15,10 +15,14 @@ const margin = { left: 160, right: 70, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-export default (selection, { data, maxCountries, colorScale }) => {
-
-  const width = selection.attr('width');
-  const height = selection.attr('height');
+export default (selection, props) => {
+  const {
+    data,
+    maxCountries,
+    colorScale,
+    width,
+    height
+  } = props
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;

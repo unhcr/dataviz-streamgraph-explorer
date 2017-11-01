@@ -111,7 +111,16 @@ function getYearData(year, data){
 
 // This is the top-level component that manages the
 // elements within the details view.
-export default function (selection, year, srcData, destData, colorScale) {
+export default function (selection, props) {
+
+  const {
+    year,
+    srcData,
+    destData,
+    colorScale,
+    width,
+    height
+  } = props;
 
   // Compute the filtered data for the selected year.
   const yearSrcData = getYearData(year, srcData);
@@ -121,9 +130,18 @@ export default function (selection, year, srcData, destData, colorScale) {
   select('#details-statistic-label').text(label(data));
   select('#details-statistic-value').text(value(data));
   select('#details-bars-label').text(barsLabel(data));
+
+  // Set the width and height of the SVG.
+  selection
+      .attr('width', width)
+      .attr('height', height);
+
+  // Render the bar chart.
   selection.call(detailsBarChart, {
     data: topN(barsData(data)),
     maxCountries,
-    colorScale
+    colorScale,
+    width,
+    height
   });
 };

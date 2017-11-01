@@ -146,11 +146,6 @@ dataFlow('focusSVGSize', focusBox => {
     .attr('width', focusBox.width)
     .attr('height', focusBox.height);
 }, 'focusBox');
-dataFlow('detailsSVGSize', detailsBox => {
-  detailsSVG
-    .attr('width', detailsBox.width)
-    .attr('height', detailsBox.height);
-}, 'detailsBox');
 
 //TODO change this one line to use the real API when it's ready.
 const api = apiSimulation({ useWebWorker: false });
@@ -167,9 +162,16 @@ dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
-dataFlow('detailsPanel', (year, srcData, destData) => {
-  detailsSVG.call(detailsPanel, year, srcData, destData, colorScale);
-}, 'year, srcData, destData')
+dataFlow('detailsPanel', (year, srcData, destData, detailsBox) => {
+  detailsSVG.call(detailsPanel, {
+    year,
+    srcData,
+    destData,
+    colorScale,
+    width: detailsBox.width,
+    height: detailsBox.height
+  });
+}, 'year, srcData, destData, detailsBox')
 
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
