@@ -1,6 +1,6 @@
 import { component } from 'd3-component';
 import { area, curveBasis, stack, stackOffsetWiggle, stackOrderInsideOut } from 'd3-shape';
-import { scaleLinear, scaleOrdinal, schemeCategory10, } from 'd3-scale';
+import { scaleLinear } from 'd3-scale';
 import { set } from 'd3-collection';
 import { min, max, extent } from 'd3-array';
 import { local } from 'd3-selection';
@@ -44,11 +44,25 @@ const forStacking = data => Object.keys(data)
 // The accessor function for the X value, returns the date.
 const xValue = d => d.date;
 
-// Create the x, y, and color scales.
-const colorScale = scaleOrdinal().range(schemeCategory10);
-
 // The d3 local that stores things local to each StreamGraph instance.
 const streamLocal = local();
+
+// The component that will render the label.
+const labelOffsetX = 15;
+const labelOffsetY = 2;
+const labelComponent = component('text', 'label')
+  .create((selection, props) => {
+    selection
+        .attr('x', labelOffsetX)
+        .attr('y', labelOffsetY)
+        .attr('alignment-baseline', 'hanging')
+        .attr('font-size', '1.5em')
+        .attr('font-weight', '700')
+        .style('text-transform', 'uppercase');
+  })
+  .render((selection, props) => {
+    selection.text(props.label);
+  });
 
 // The d3-component for StreamGraph, exported from this module.
 const StreamGraph = component('g')
@@ -66,9 +80,9 @@ const StreamGraph = component('g')
 
     // The debounced function that positions and reveals labels.
     const renderLabels = debounce(() => {
-      selection.selectAll('text')
+      selection.selectAll('.area-label')
           .attr('transform', areaLabel(streamArea))
-          .attr('opacity', .7);
+          .attr('opacity', 1);
     }, 500);
 
     // Store the renderLabels and streamArea local to the instance.
@@ -87,6 +101,9 @@ const StreamGraph = component('g')
     const margin = props.margin;
     const onYearSelect = props.onYearSelect;
     const xScale = props.xScale;
+    const colorScale = props.colorScale;
+
+    const label = props.label;
 
     // Unpack local objects.
     const my = streamLocal.get(selection.node());
@@ -136,8 +153,8 @@ const StreamGraph = component('g')
         .style('cursor', 'pointer')
         .attr('fill-opacity', .8)
       .merge(paths)
-        .attr('fill', d => colorScale(d.index))
-        .attr('stroke', d => colorScale(d.index))
+        .attr('fill', d => colorScale(d.key))
+        .attr('stroke', d => colorScale(d.key))
         .attr('d', streamArea)
         .on('click', d => {
 
@@ -156,17 +173,24 @@ const StreamGraph = component('g')
         .on('mousemove', invokeWithYear(onYearSelect, selection, xScale));
     paths.exit().remove();
 
-    // Render the labels.
-    const labels = selection.selectAll('text').data(stacked);
+    // Render the area labels.
+    const labels = selection
+      .selectAll('.area-label').data(stacked);
     labels
       .enter().append('text')
+        .attr('class', 'area-label')
         .style('pointer-events', 'none')
-        .attr('fill', 'white')
+        .attr('fill', '#1b1c1d')
       .merge(labels)
         .text(d => d.key)
         .attr('opacity', 0);
     labels.exit().remove();
     renderLabels();
+
+    // Render the label of the whole StreamGraph.
+    selection.call(labelComponent, {
+      label: stacked.length > 1 ? label.plural : label.singular
+    });
   });
 
 export default StreamGraph;

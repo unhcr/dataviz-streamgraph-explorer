@@ -17,6 +17,7 @@ import detailsPanel from './detailsPanel';
 import setIfChanged from './setIfChanged';
 import contextStream from './contextStream';
 import contextStreamData from './contextStreamData';
+import colorScale from './colorScale';
 
 // Scaffold DOM structure.
 const focusSVG = select('#focus').append('svg');
@@ -145,11 +146,6 @@ dataFlow('focusSVGSize', focusBox => {
     .attr('width', focusBox.width)
     .attr('height', focusBox.height);
 }, 'focusBox');
-dataFlow('detailsSVGSize', detailsBox => {
-  detailsSVG
-    .attr('width', detailsBox.width)
-    .attr('height', detailsBox.height);
-}, 'detailsBox');
 
 //TODO change this one line to use the real API when it's ready.
 const api = apiSimulation({ useWebWorker: false });
@@ -166,9 +162,16 @@ dataFlow('apiRequest', api.sendRequest, 'apiQuery');
 dataFlow('srcData', d => d.srcData, 'apiResponse');
 dataFlow('destData', d => d.destData, 'apiResponse');
 
-dataFlow('detailsPanel', (year, srcData, destData) => {
-  detailsSVG.call(detailsPanel, year, srcData, destData);
-}, 'year, srcData, destData')
+dataFlow('detailsPanel', (year, srcData, destData, detailsBox) => {
+  detailsSVG.call(detailsPanel, {
+    year,
+    srcData,
+    destData,
+    colorScale,
+    width: detailsBox.width,
+    height: detailsBox.height
+  });
+}, 'year, srcData, destData, detailsBox')
 
 // Reduce the data to show only the largest areas.
 dataFlow('srcDataReduced', reduceData, 'srcData');
@@ -185,21 +188,24 @@ dataFlow('focusXScale', (() => {
   };
 })(), 'timeExtent, zoom, focusBox, focusMargin');
 
-
 // Render the source and destination StreamGraphs.
 dataFlow((srcDataReduced, srcStreamBox, destDataReduced, destStreamBox, margin, xScale) => {
   focusStreamGraphLayer.call(StreamGraph, [
     {
+      label: { singular: 'Origin', plural: 'Origins' },
       margin,
       xScale,
+      colorScale,
       data: srcDataReduced,
       box: srcStreamBox,
       onStreamClick: dataFlow.src,
       onYearSelect: setIfChanged(dataFlow.year)
     },
     {
+      label: { singular: 'Destination', plural: 'Destinations' },
       margin,
       xScale,
+      colorScale,
       data: destDataReduced,
       box: destStreamBox,
       onStreamClick: dataFlow.dest,
@@ -227,14 +233,15 @@ dataFlow((box, year, xScale) => {
 }, 'focusBox, year, focusXScale');
 
 // Render the context stream.
-dataFlow((box, zoom, srcData) => {
+dataFlow((box, zoom, srcData, timeExtent) => {
   focusStreamGraphLayer.call(contextStream, {
     box,
     zoom,
     data: contextStreamData(srcData),
-    onBrush: dataFlow.zoom
+    onBrush: dataFlow.zoom,
+    timeExtent
   });
-}, 'contextStreamBox, zoom, srcData');
+}, 'contextStreamBox, zoom, srcData, timeExtent');
 
 // Render the type selector buttons.
 dataFlow('typeSelector', (types, availableTypes) => {
