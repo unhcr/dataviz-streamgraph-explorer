@@ -82,7 +82,7 @@ const StreamGraph = component('g')
     const renderLabels = debounce(() => {
       selection.selectAll('.area-label')
           .attr('transform', areaLabel(streamArea))
-          .attr('opacity', .7);
+          .attr('opacity', 1);
     }, 500);
 
     // Store the renderLabels and streamArea local to the instance.
@@ -180,7 +180,7 @@ const StreamGraph = component('g')
       .enter().append('text')
         .attr('class', 'area-label')
         .style('pointer-events', 'none')
-        .attr('fill', 'white')
+        .attr('fill', '#1b1c1d')
       .merge(labels)
         .text(d => d.key)
         .attr('opacity', 0);

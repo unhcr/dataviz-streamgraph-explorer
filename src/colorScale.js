@@ -9,5 +9,5 @@ export default scaleOrdinal()
   .domain(allCountries)
   .range(allCountries.map((country, i) => {
     const t = i / allCountries.length;
-    return hcl(t * 360, 50, 60);
+    return hcl(t * 360, 50, 70);
   }));
