@@ -1,6 +1,7 @@
 import { scaleLinear, scaleBand } from 'd3-scale';
 import { max } from 'd3-array';
 import { format } from 'd3-format';
+import textColor from './textColor';
 
 const xValue = d => d.value;
 const yValue = d => d.name;
@@ -8,10 +9,7 @@ const commaFormat = format(',');
 const labelValue = d => yValue(d) + ': ' + commaFormat(xValue(d));
 
 // The fraction of the bar height used by the bar label text.
-const fontScale = 0.7;
-
-// Determines the width of the stroke behind the bar label text.
-const strokeScale = 0.15;
+const fontScale = 0.5;
 
 const xScale = scaleLinear();
 const yScale = scaleBand()
@@ -71,26 +69,13 @@ export default (selection, props) => {
 
   const fontSize = barHeight * fontScale + 'px';
 
-  // Render the labels in the back with stroke.
-  barsEnter
-    .append('text')
-      .attr('class', 'back-text')
-      .attr('dy', '0.32em')
-      .attr('x', labelPadding)
-      .attr('stroke', 'white')
-      .attr('stroke-linejoin', 'round')
-    .merge(bars.select('.back-text'))
-      .attr('font-size', fontSize)
-      .attr('stroke-width', barHeight * strokeScale)
-      .attr('y', yScale.bandwidth() / 2)
-      .text(labelValue);
-
-  // Render the labels in the front without stroke.
+  // Render the labels.
   barsEnter
     .append('text')
       .attr('class', 'front-text')
       .attr('dy', '0.32em')
       .attr('x', labelPadding)
+      .attr('fill', textColor)
     .merge(bars.select('.front-text'))
       .attr('font-size', fontSize)
       .attr('y', yScale.bandwidth() / 2)

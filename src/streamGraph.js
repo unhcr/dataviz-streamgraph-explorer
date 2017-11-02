@@ -9,6 +9,7 @@ import debounce from 'lodash.debounce';
 import dateFromYear from './dateFromYear';
 import backgroundRect from './backgroundRect';
 import invokeWithYear from './invokeWithYear';
+import textColor from './textColor';
 
 // The d3.stack layout for computing StreamGraph area shapes.
 const streamStack = stack()
@@ -180,7 +181,7 @@ const StreamGraph = component('g')
       .enter().append('text')
         .attr('class', 'area-label')
         .style('pointer-events', 'none')
-        .attr('fill', '#1b1c1d')
+        .attr('fill', textColor)
       .merge(labels)
         .text(d => d.key)
         .attr('opacity', 0);
