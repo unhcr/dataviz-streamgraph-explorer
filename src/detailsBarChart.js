@@ -1,24 +1,33 @@
 import { scaleLinear, scaleBand } from 'd3-scale';
 import { max } from 'd3-array';
 import { format } from 'd3-format';
+import textColor from './textColor';
 
 const xValue = d => d.value;
 const yValue = d => d.name;
 const commaFormat = format(',');
+const labelValue = d => yValue(d) + ': ' + commaFormat(xValue(d));
+
+// The fraction of the bar height used by the bar label text.
+const fontScale = 0.5;
 
 const xScale = scaleLinear();
 const yScale = scaleBand()
   .paddingInner(0.2)
   .paddingOuter(0);
 
-const margin = { left: 160, right: 70, top: 0, bottom: 0 };
+const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 
 const labelPadding = 3;
 
-export default (selection, { data, maxCountries }) => {
-
-  const width = selection.attr('width');
-  const height = selection.attr('height');
+export default (selection, props) => {
+  const {
+    data,
+    maxCountries,
+    colorScale,
+    width,
+    height
+  } = props
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -42,8 +51,7 @@ export default (selection, { data, maxCountries }) => {
 
   // Each "bar" is a group that will contain
   //  - a rectangle
-  //  - a label on the left (name)
-  //  - a label on the right (value)
+  //  - a label on top of the bar (name + value)
   const bars = g.selectAll('g').data(data);
   const barsEnter = bars.enter().append('g');
   bars.exit().remove();
@@ -54,30 +62,22 @@ export default (selection, { data, maxCountries }) => {
   // Render the rectangles.
   barsEnter
     .append('rect')
-      .attr('fill', 'steelblue')
     .merge(bars.select('rect'))
+      .attr('fill', d => colorScale(yValue(d)))
       .attr('width', d => xScale(xValue(d)))
       .attr('height', yScale.bandwidth());
 
-  // Render the labels on the left.
-  barsEnter
-    .append('text')
-      .attr('class', 'name-label')
-      .attr('dy', '0.32em')
-      .attr('x', -labelPadding)
-      .attr('text-anchor', 'end')
-    .merge(bars.select('.name-label'))
-      .attr('y', yScale.bandwidth() / 2)
-      .text(yValue);
+  const fontSize = barHeight * fontScale + 'px';
 
-  // Render the labels on the right.
+  // Render the labels.
   barsEnter
     .append('text')
-      .attr('class', 'value-label')
+      .attr('class', 'front-text')
       .attr('dy', '0.32em')
-      .attr('text-anchor', 'start')
-    .merge(bars.select('.value-label'))
+      .attr('x', labelPadding)
+      .attr('fill', textColor)
+    .merge(bars.select('.front-text'))
+      .attr('font-size', fontSize)
       .attr('y', yScale.bandwidth() / 2)
-      .attr('x', d => xScale(xValue(d)) + labelPadding)
-      .text(d => commaFormat(xValue(d)));
+      .text(labelValue);
 }
