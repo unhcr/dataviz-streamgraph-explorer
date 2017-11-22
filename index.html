@@ -7,38 +7,67 @@
     <link rel="stylesheet" href="https://unpkg.com/dataviz-styleguide/semantic/dist/semantic.min.css">
   </head>
   <body>
-    <div class="ui stackable two column grid">
-      <div class="twelve wide column">
-        <p>Filter Population Types</p>
 
-        <!--
-          The type selector buttons will be injected here.
-          See src/typeSelector.js.
-        -->
-        <div id="typeSelector"></div>
-
-        <!--
-          The visualization components that are in the
-          "focus" panel will be injected into this DIV.
-        -->
-        <div id="focus"></div>
-
-      </div>
-      <div class="four wide column">
-        <div class="ui statistic">
-          <div class="label">Selected year</div>
-          <div id="details-selected-year" class="value"></div>
-          <div id="details-statistic-label" class="label"></div>
-          <div id="details-statistic-value" class="value"></div>
-          <div id="details-bars-label" class="label"></div>
+    <div id="container">
+      <br/>
+      <div class="ui grid unhcr-header unhcr-header-style3">
+        <img class="unhcr-header-logo" src="images/unhcr-logo-horizontal.svg">
+        <div class="unhcr-header-title">
+          <h1>Dataviz</h1>
+          <h2>Streamgraph Explorer</h2>  
+          <h3>Evolution of persons of concern over timer</h3>
         </div>
-        <!--
-          The visualization components that are in the
-          "details" panel will be injected into this DIV.
-        -->
-        <div id="details"></div>
+        <div class="unhcr-header-social">
+          <a href="#" target="_blank" title="Share on Facebook"><i class="facebook square icon"></i></a>
+          <a href="#" target="_blank" title="Share on Twitter"><i class="twitter square icon"></i></a> 
+        </div>
+      </div>
+      
+      <div class="ui stackable two column grid" style="margin-top: 0px;">
+        <div class="twelve wide column">
+          <div class="ui statistic"><div class="label">Filter Population Types</div></div>
+
+          <!--
+            The type selector buttons will be injected here.
+            See src/typeSelector.js.
+          -->
+          <div id="typeSelector"></div>
+
+          <!--
+            The visualization components that are in the
+            "focus" panel will be injected into this DIV.
+          -->
+          <div id="focus"></div>
+
+        </div>
+        <div class="four wide column">
+          <div class="ui statistic">
+            <div class="label">Selected year</div>
+            <div id="details-selected-year" class="value"></div>
+            <div id="details-statistic-label" class="label"></div>
+            <div id="details-statistic-value" class="value"></div>
+            <div id="details-bars-label" class="label"></div>
+          </div>
+          <!--
+            The visualization components that are in the
+            "details" panel will be injected into this DIV.
+          -->
+          <div id="details"></div>
+        </div>
       </div>
     </div>
     <script src="dist/bundle.js"></script>
   </body>
 </html>
+
+<style>
+  #container {
+    padding: 0px 10px;
+  }
+  
+  .column {
+    margin-top: 0px;
+    padding-top: 2px !important;
+  }
+
+</style>
