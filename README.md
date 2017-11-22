@@ -28,6 +28,13 @@ http-server
 
 Now the site should be available at localhost:8080.
 
+To get the latest data on fresh install
+
+```
+cd data
+?
+```
+
 ## Deployment
 
 We are using GitHub pages to deploy this project to the Web. Deployments are manual, and require the following steps:
