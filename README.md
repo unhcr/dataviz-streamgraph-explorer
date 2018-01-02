@@ -28,12 +28,18 @@ http-server
 
 Now the site should be available at localhost:8080.
 
-To get the latest data on fresh install
+## Updating Data
+
+The data is present in the repository under `/data`. Every so often (e.g. yearly), the data will need to be updated. Here's how you can update the data:
 
 ```
 cd data
-?
+sh fetchData.sh
+npm install
+node ./process.js
 ```
+
+This will update the content of `data/data.json`, which is loaded by the visualization.
 
 ## Deployment
 
