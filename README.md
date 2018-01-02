@@ -1,4 +1,4 @@
-# streamgraph-explorer
+# dataviz-streamgraph-explorer
 
 An interactive visualization system for exploring flow timeseries data (work in progress).
 
@@ -9,7 +9,7 @@ You can try it out here: https://unhcr.github.io/dataviz-streamgraph-explorer/
 This project uses NPM and Webpack. To get started, clone the repository and install dependencies like this:
 
 ```
-cd streamgraph-explorer
+cd dataviz-streamgraph-explorer
 npm install
 ```
 
@@ -27,6 +27,19 @@ http-server
 ```
 
 Now the site should be available at localhost:8080.
+
+## Updating Data
+
+The data is present in the repository under `/data`. Every so often (e.g. yearly), the data will need to be updated. Here's how you can update the data:
+
+```
+cd data
+sh fetchData.sh
+npm install
+node ./process.js
+```
+
+This will update the content of `data/data.json`, which is loaded by the visualization.
 
 ## Deployment
 
