@@ -13677,7 +13677,7 @@ const timePanel = Object(__WEBPACK_IMPORTED_MODULE_0_d3_component__["a" /* compo
     selection.selectAll('.tick text')
         .attr('dy', '0.32em')
         .attr('y', box.y + box.height / 2)
-        .style('font-size', '16pt')
+        .style('font-size', `${box.width / 70}pt`)
         .style('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .style('fill', '#030303')
         .style('pointer-events', 'none');
