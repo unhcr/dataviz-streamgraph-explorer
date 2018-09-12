@@ -34,7 +34,7 @@ const dataFlow = ReactiveModel();
 dataFlow('year', 2016);
 
 // The full time extent.
-dataFlow('timeExtent', [1951, 2016].map(dateFromYear));
+dataFlow('timeExtent', [1951, 2017].map(dateFromYear));
 
 // The list of all population types available for filtering.
 dataFlow('availableTypes', [
